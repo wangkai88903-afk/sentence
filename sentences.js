@@ -1,0 +1,3651 @@
+window.SENTENCES = [
+  {
+    "id": "7A-01",
+    "book": "7上",
+    "page": 37,
+    "sentence": "As a rock music lover, I play the electric guitar in the school band.",
+    "translation": "作为一名摇滚乐爱好者，我在学校乐队里弹电吉他。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "As a rock music lover",
+        "note": "as 引导的介词短语作状语，说明身份/原因，意为“作为一名摇滚乐爱好者”。"
+      },
+      {
+        "type": "主句",
+        "text": "I play the electric guitar in the school band",
+        "note": "主语 I + 谓语 play + 宾语 the electric guitar + 地点状语 in the school band（在学校乐队里）。"
+      }
+    ],
+    "grammar": [
+      "as 介词短语作状语（表身份）",
+      "主谓宾 S+V+O 基本句型",
+      "in the school band 介词短语作地点状语"
+    ],
+    "words": [
+      {
+        "w": "rock",
+        "pos": "n.",
+        "m": "摇滚乐"
+      },
+      {
+        "w": "electric",
+        "pos": "adj.",
+        "m": "电的；电动的"
+      },
+      {
+        "w": "guitar",
+        "pos": "n.",
+        "m": "吉他"
+      },
+      {
+        "w": "band",
+        "pos": "n.",
+        "m": "乐队"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "As a rock music lover",
+        "note": "as 介词短语，表身份，意为“作为一名摇滚乐爱好者”。"
+      },
+      {
+        "role": "主语",
+        "text": "I",
+        "note": "句子主语，指代说话人。"
+      },
+      {
+        "role": "谓语",
+        "text": "play",
+        "note": "及物动词，作谓语。"
+      },
+      {
+        "role": "宾语",
+        "text": "the electric guitar",
+        "note": "play 的宾语，the electric 修饰 guitar。"
+      },
+      {
+        "role": "状语",
+        "text": "in the school band",
+        "note": "介词短语作地点状语，意为“在学校乐队里”。"
+      }
+    ]
+  },
+  {
+    "id": "7A-02",
+    "book": "7上",
+    "page": 38,
+    "sentence": "There is an art festival every autumn in my school.",
+    "translation": "每年秋天，我们学校都会举办一次艺术节。",
+    "analysis": [
+      {
+        "type": "主句",
+        "text": "There is an art festival every autumn in my school",
+        "note": "There be 句型，主语是 an art festival（倒装，表“存在”）；every autumn 与 in my school 均为状语。"
+      }
+    ],
+    "grammar": [
+      "There be 句型表示“某处有某物”",
+      "主语 an art festival 置于 be 动词之后",
+      "every autumn 时间状语；in my school 地点状语"
+    ],
+    "words": [
+      {
+        "w": "festival",
+        "pos": "n.",
+        "m": "节日；节庆"
+      },
+      {
+        "w": "autumn",
+        "pos": "n.",
+        "m": "秋天"
+      },
+      {
+        "w": "every",
+        "pos": "adj.",
+        "m": "每个"
+      }
+    ],
+    "components": [
+      {
+        "role": "引导词",
+        "text": "There",
+        "note": "形式主语，引导存在句 There be。"
+      },
+      {
+        "role": "谓语",
+        "text": "is",
+        "note": "系动词，与 There 构成存在句型。"
+      },
+      {
+        "role": "主语",
+        "text": "an art festival",
+        "note": "真正主语，置于 be 动词之后（完全倒装）。"
+      },
+      {
+        "role": "状语",
+        "text": "every autumn",
+        "note": "时间状语。“每年秋天”。"
+      },
+      {
+        "role": "状语",
+        "text": "in my school",
+        "note": "地点状语。“在我们学校”。"
+      }
+    ]
+  },
+  {
+    "id": "7A-03",
+    "book": "7上",
+    "page": 40,
+    "sentence": "For a long time, young people didn't have much interest in traditional arts.",
+    "translation": "很长一段时间里，年轻人并没有对传统艺术有太多兴趣。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "For a long time",
+        "note": "for + 时间段作时间状语，意为“在很长一段时间里”。"
+      },
+      {
+        "type": "主句",
+        "text": "young people didn't have much interest in traditional arts",
+        "note": "主语 young people + 谓语 didn't have + 宾语 much interest + 定语 in traditional arts（对传统艺术的）。"
+      }
+    ],
+    "grammar": [
+      "一般过去时的否定形式 didn't + 动词原形",
+      "for + 时间段 作时间状语",
+      "have interest in... 对……有兴趣；in traditional arts 介词短语作后置定语"
+    ],
+    "words": [
+      {
+        "w": "traditional",
+        "pos": "adj.",
+        "m": "传统的"
+      },
+      {
+        "w": "interest",
+        "pos": "n.",
+        "m": "兴趣"
+      },
+      {
+        "w": "art",
+        "pos": "n.",
+        "m": "艺术；美术"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "For a long time",
+        "note": "for + 时间段作时间状语，“在很长一段时间里”。"
+      },
+      {
+        "role": "主语",
+        "text": "young people",
+        "note": "句子主语。“年轻人”。"
+      },
+      {
+        "role": "谓语",
+        "text": "didn't have",
+        "note": "一般过去时否定谓语。"
+      },
+      {
+        "role": "宾语",
+        "text": "much interest",
+        "note": "have 的宾语。“很多兴趣”。"
+      },
+      {
+        "role": "定语",
+        "text": "in traditional arts",
+        "note": "介词短语作后置定语，修饰 interest，“对传统艺术的”。"
+      }
+    ]
+  },
+  {
+    "id": "7A-04",
+    "book": "7上",
+    "page": 42,
+    "sentence": "People watch wild birds in nature, and get to know their names, looks and habits.",
+    "translation": "人们在自然中观察野生鸟类，并了解它们的名字、外形和习性。",
+    "analysis": [
+      {
+        "type": "主句",
+        "text": "People watch wild birds in nature",
+        "note": "主语 People + 谓语 watch + 宾语 wild birds + 地点状语 in nature。"
+      },
+      {
+        "type": "并列",
+        "text": "and get to know their names, looks and habits",
+        "note": "and 连接第二个并列谓语 get to know，其宾语由 names, looks and habits 三个名词并列构成。"
+      }
+    ],
+    "grammar": [
+      "and 连接两个并列谓语（watch ... and get to know ...）",
+      "get to know 逐渐了解",
+      "三个名词 names, looks, habits 由 and 并列作宾语"
+    ],
+    "words": [
+      {
+        "w": "wild",
+        "pos": "adj.",
+        "m": "野生的"
+      },
+      {
+        "w": "nature",
+        "pos": "n.",
+        "m": "自然"
+      },
+      {
+        "w": "habit",
+        "pos": "n.",
+        "m": "习惯；习性"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "People",
+        "note": "句子主语。“人们”。"
+      },
+      {
+        "role": "谓语①",
+        "text": "watch",
+        "note": "第一个并列谓语。"
+      },
+      {
+        "role": "宾语①",
+        "text": "wild birds",
+        "note": "watch 的宾语。"
+      },
+      {
+        "role": "状语",
+        "text": "in nature",
+        "note": "地点状语。“在自然中”。"
+      },
+      {
+        "role": "谓语②",
+        "text": "and get to know",
+        "note": "and 连接的第二个并列谓语。"
+      },
+      {
+        "role": "宾语②",
+        "text": "their names, looks and habits",
+        "note": "三个名词并列作 get to know 的宾语。"
+      }
+    ]
+  },
+  {
+    "id": "7A-05",
+    "book": "7上",
+    "page": 53,
+    "sentence": "For years, the father served as the postman for this area.",
+    "translation": "多年来，这位父亲一直担任这一片区的邮递员。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "For years",
+        "note": "for + 时间段作时间状语，意为“多年来”。"
+      },
+      {
+        "type": "主句",
+        "text": "the father served as the postman for this area",
+        "note": "主语 the father + 谓语 served as（担任）+ 表语 the postman + 范围状语 for this area。"
+      }
+    ],
+    "grammar": [
+      "serve as... 担任……；作为……",
+      "一般过去时 served",
+      "for this area 介词短语作范围状语"
+    ],
+    "words": [
+      {
+        "w": "serve",
+        "pos": "v.",
+        "m": "服务；担任"
+      },
+      {
+        "w": "postman",
+        "pos": "n.",
+        "m": "邮递员"
+      },
+      {
+        "w": "area",
+        "pos": "n.",
+        "m": "地区；区域"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "For years",
+        "note": "时间状语，“多年来”。"
+      },
+      {
+        "role": "主语",
+        "text": "the father",
+        "note": "句子主语，“这位父亲”。"
+      },
+      {
+        "role": "谓语",
+        "text": "served as",
+        "note": "系动词性短语，意为“担任”。"
+      },
+      {
+        "role": "表语",
+        "text": "the postman",
+        "note": "served as 的表语。“邮递员”。"
+      },
+      {
+        "role": "状语",
+        "text": "for this area",
+        "note": "范围状语，“这一片区”。"
+      }
+    ]
+  },
+  {
+    "id": "7A-06",
+    "book": "7上",
+    "page": 54,
+    "sentence": "For the first time, the son carries his father across a cold river.",
+    "translation": "儿子第一次把父亲背过了冰冷的河。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "For the first time",
+        "note": "介词短语作状语，意为“第一次”，修饰整个句子。"
+      },
+      {
+        "type": "主句",
+        "text": "the son carries his father across a cold river",
+        "note": "主语 the son + 谓语 carries + 宾语 his father + 路径状语 across a cold river（穿过一条冰冷的河）。"
+      }
+    ],
+    "grammar": [
+      "for the first time 首次（作状语）",
+      "carry sb across... 把某人背/带过……",
+      "across a cold river 介词短语作路径状语"
+    ],
+    "words": [
+      {
+        "w": "carry",
+        "pos": "v.",
+        "m": "搬；背；携带"
+      },
+      {
+        "w": "across",
+        "pos": "prep.",
+        "m": "穿过；横过"
+      },
+      {
+        "w": "cold",
+        "pos": "adj.",
+        "m": "寒冷的"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "For the first time",
+        "note": "介词短语作状语，“第一次”。"
+      },
+      {
+        "role": "主语",
+        "text": "the son",
+        "note": "句子主语，“儿子”。"
+      },
+      {
+        "role": "谓语",
+        "text": "carries",
+        "note": "及物动词谓语。“背 / 携带”。"
+      },
+      {
+        "role": "宾语",
+        "text": "his father",
+        "note": "carries 的宾语。"
+      },
+      {
+        "role": "状语",
+        "text": "across a cold river",
+        "note": "路径状语，across 表“穿过”，cold 修饰 river。“穿过一条冰冷的河”。"
+      }
+    ]
+  },
+  {
+    "id": "7A-07",
+    "book": "7上",
+    "page": 69,
+    "sentence": "I wanted to treat my British friend, Emilia, to a Chinese dinner.",
+    "translation": "我想请我的英国朋友埃米莉亚吃一顿中式晚餐。",
+    "analysis": [
+      {
+        "type": "主句",
+        "text": "I wanted to treat my British friend to a Chinese dinner",
+        "note": "主语 I + 谓语 wanted + 宾语 to treat...（不定式短语）；treat sb to sth 意为“请某人吃/享受某物”。"
+      },
+      {
+        "type": "插语",
+        "text": "Emilia",
+        "note": "专有名词 Emilia 作 my British friend 的同位语，补充说明朋友的名字。"
+      }
+    ],
+    "grammar": [
+      "want to do sth 想要做某事",
+      "treat sb to sth 请某人吃……／以……款待某人",
+      "同位语 Emilia 解释 my British friend"
+    ],
+    "words": [
+      {
+        "w": "treat",
+        "pos": "v.",
+        "m": "款待；请（客）"
+      },
+      {
+        "w": "British",
+        "pos": "adj.",
+        "m": "英国的"
+      },
+      {
+        "w": "dinner",
+        "pos": "n.",
+        "m": "正餐；晚餐"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "I",
+        "note": "句子主语。"
+      },
+      {
+        "role": "谓语",
+        "text": "wanted",
+        "note": "及物动词谓语，后接不定式作宾语。"
+      },
+      {
+        "role": "宾语(不定式)",
+        "text": "to treat my British friend to a Chinese dinner",
+        "note": "want to do 的不定式宾语。"
+      },
+      {
+        "role": "间接宾语",
+        "text": "my British friend",
+        "note": "treat 的间接宾语，British 为前置定语。"
+      },
+      {
+        "role": "直接宾语",
+        "text": "a Chinese dinner",
+        "note": "treat 的直接宾语。"
+      },
+      {
+        "role": "同位语",
+        "text": "Emilia",
+        "note": "专有名词，作 my British friend 的同位语，解释名字。"
+      }
+    ]
+  },
+  {
+    "id": "7A-08",
+    "book": "7上",
+    "page": 74,
+    "sentence": "They put up a Christmas tree at home, share a large meal together, and give each other gifts.",
+    "translation": "他们在家里装饰圣诞树，一起享用丰盛的饭菜，并互赠礼物。",
+    "analysis": [
+      {
+        "type": "主句",
+        "text": "They put up a Christmas tree at home",
+        "note": "主语 They + 谓语 put up + 宾语 a Christmas tree + 地点状语 at home。"
+      },
+      {
+        "type": "并列",
+        "text": "share a large meal together",
+        "note": "and 连接的第二个并列谓语 share + 宾语 a large meal。"
+      },
+      {
+        "type": "并列",
+        "text": "and give each other gifts",
+        "note": "and 连接的第三个并列谓语 give + 间接宾语 each other + 直接宾语 gifts。"
+      }
+    ],
+    "grammar": [
+      "三个并列谓语由 and 连接：put up ... , share ... , and give ...",
+      "put up 搭建／装饰",
+      "each other 互相（作间接宾语）"
+    ],
+    "words": [
+      {
+        "w": "put up",
+        "pos": "phr.",
+        "m": "搭建；装饰；张贴"
+      },
+      {
+        "w": "Christmas",
+        "pos": "n.",
+        "m": "圣诞节"
+      },
+      {
+        "w": "gift",
+        "pos": "n.",
+        "m": "礼物"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "They",
+        "note": "句子主语。“他们”。"
+      },
+      {
+        "role": "谓语①",
+        "text": "put up",
+        "note": "第一个并列谓语，“装饰 / 搭建”。"
+      },
+      {
+        "role": "宾语①",
+        "text": "a Christmas tree",
+        "note": "put up 的宾语。"
+      },
+      {
+        "role": "状语",
+        "text": "at home",
+        "note": "地点状语。“在家里”。"
+      },
+      {
+        "role": "谓语②",
+        "text": "share",
+        "note": "第二个并列谓语。“分享”。"
+      },
+      {
+        "role": "宾语②",
+        "text": "a large meal",
+        "note": "share 的宾语。"
+      },
+      {
+        "role": "谓语③",
+        "text": "give",
+        "note": "第三个并列谓语（and 连接）。"
+      },
+      {
+        "role": "间接宾语",
+        "text": "each other",
+        "note": "give 的间接宾语，“互相”。"
+      },
+      {
+        "role": "直接宾语",
+        "text": "gifts",
+        "note": "give 的直接宾语。“礼物”。"
+      }
+    ]
+  },
+  {
+    "id": "7A-09",
+    "book": "7上",
+    "page": 77,
+    "sentence": "As a doctor in the emergency room, Leng misses many family meals with her loved ones.",
+    "translation": "作为急诊室的医生，冷医生错过了许多与亲人共处的家庭聚餐。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "As a doctor in the emergency room",
+        "note": "as 介词短语作状语，说明身份；in the emergency room 作后置定语修饰 doctor。"
+      },
+      {
+        "type": "主句",
+        "text": "Leng misses many family meals with her loved ones",
+        "note": "主语 Leng + 谓语 misses + 宾语 many family meals + 伴随状语 with her loved ones。"
+      }
+    ],
+    "grammar": [
+      "as 介词短语作状语（表职业/身份）",
+      "in the emergency room 介词短语作定语",
+      "with her loved ones 介词短语作伴随状语"
+    ],
+    "words": [
+      {
+        "w": "emergency",
+        "pos": "n./adj.",
+        "m": "紧急情况；急诊的"
+      },
+      {
+        "w": "miss",
+        "pos": "v.",
+        "m": "错过；想念"
+      },
+      {
+        "w": "loved ones",
+        "pos": "phr.",
+        "m": "亲人；所爱的人"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "As a doctor in the emergency room",
+        "note": "as 介词短语作状语，表身份；in the emergency room 作后置定语修饰 doctor。"
+      },
+      {
+        "role": "主语",
+        "text": "Leng",
+        "note": "句子主语，“冷医生”。"
+      },
+      {
+        "role": "谓语",
+        "text": "misses",
+        "note": "及物动词谓语，“错过”。"
+      },
+      {
+        "role": "宾语",
+        "text": "many family meals",
+        "note": "misses 的宾语。“许多家庭聚餐”。"
+      },
+      {
+        "role": "状语",
+        "text": "with her loved ones",
+        "note": "伴随状语，“与亲人一起”。"
+      }
+    ]
+  },
+  {
+    "id": "7A-10",
+    "book": "7上",
+    "page": 109,
+    "sentence": "It is not only good for our health, but also a key part of many cultures.",
+    "translation": "它不仅有益于我们的健康，也是许多文化的重要组成部分。",
+    "analysis": [
+      {
+        "type": "主句",
+        "text": "It is not only good for our health, but also a key part of many cultures",
+        "note": "主语 It + 系动词 is + 表语，由 not only... but also... 连接两个并列表语：good for our health 与 a key part of many cultures。"
+      }
+    ],
+    "grammar": [
+      "not only... but also... 不但……而且……（连接并列成分）",
+      "be good for... 对……有益",
+      "a key part of... ……的关键/重要组成部分"
+    ],
+    "words": [
+      {
+        "w": "health",
+        "pos": "n.",
+        "m": "健康"
+      },
+      {
+        "w": "key",
+        "pos": "adj.",
+        "m": "关键的；重要的"
+      },
+      {
+        "w": "culture",
+        "pos": "n.",
+        "m": "文化"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "It",
+        "note": "形式主语，指代前文提到的事物。"
+      },
+      {
+        "role": "谓语",
+        "text": "is",
+        "note": "系动词。"
+      },
+      {
+        "role": "表语①",
+        "text": "good for our health",
+        "note": "not only...but also 连接的第一个并列表语。"
+      },
+      {
+        "role": "表语②",
+        "text": "a key part of many cultures",
+        "note": "第二个并列表语；of many cultures 作后置定语修饰 part。“许多文化的重要组成部分”。"
+      }
+    ]
+  },
+  {
+    "id": "7A-11",
+    "book": "7上",
+    "page": 110,
+    "sentence": "In Chengdu, we have as many teahouses as leaves in a cup of tea!",
+    "translation": "在成都，茶馆多得就像一杯茶里的茶叶一样！",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "In Chengdu",
+        "note": "地点状语，意为“在成都”。"
+      },
+      {
+        "type": "主句",
+        "text": "we have as many teahouses as leaves in a cup of tea",
+        "note": "主语 we + 谓语 have + 宾语 as many teahouses as leaves；as... as... 原级比较，in a cup of tea 作后置定语修饰 leaves。"
+      }
+    ],
+    "grammar": [
+      "as + 形容词原级 + 名词 + as... 和……一样……（表比较）",
+      "as many teahouses as leaves 用夸张手法强调数量多",
+      "in a cup of tea 介词短语作定语"
+    ],
+    "words": [
+      {
+        "w": "teahouse",
+        "pos": "n.",
+        "m": "茶馆"
+      },
+      {
+        "w": "leaf",
+        "pos": "n.",
+        "m": "叶子（复 leaves）"
+      },
+      {
+        "w": "cup",
+        "pos": "n.",
+        "m": "杯子"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "In Chengdu",
+        "note": "地点状语，“在成都”。"
+      },
+      {
+        "role": "主语",
+        "text": "we",
+        "note": "句子主语。"
+      },
+      {
+        "role": "谓语",
+        "text": "have",
+        "note": "及物动词谓语。“有”。"
+      },
+      {
+        "role": "宾语",
+        "text": "as many teahouses as leaves",
+        "note": "as...as 原级比较结构作宾语。"
+      },
+      {
+        "role": "定语",
+        "text": "in a cup of tea",
+        "note": "介词短语作后置定语，修饰 leaves。“一杯茶里的”。"
+      }
+    ]
+  },
+  {
+    "id": "7A-12",
+    "book": "7上",
+    "page": 133,
+    "sentence": "In the library, there are as many books as stars in the sky.",
+    "translation": "在图书馆里，书多得就像天上的星星一样。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "In the library",
+        "note": "地点状语，“在图书馆里”。"
+      },
+      {
+        "type": "主句",
+        "text": "there are as many books as stars in the sky",
+        "note": "There be 句型；主语 as many books as stars 由 as... as... 连接比较；in the sky 作定语修饰 stars。"
+      }
+    ],
+    "grammar": [
+      "There be 句型",
+      "as... as... 原级比较（as many books as stars）",
+      "in the sky 介词短语作定语"
+    ],
+    "words": [
+      {
+        "w": "library",
+        "pos": "n.",
+        "m": "图书馆"
+      },
+      {
+        "w": "star",
+        "pos": "n.",
+        "m": "星星"
+      },
+      {
+        "w": "sky",
+        "pos": "n.",
+        "m": "天空"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "In the library",
+        "note": "地点状语，“在图书馆里”。"
+      },
+      {
+        "role": "引导词",
+        "text": "There",
+        "note": "形式主语，引导存在句。"
+      },
+      {
+        "role": "谓语",
+        "text": "are",
+        "note": "系动词，与 There 构成存在句型。"
+      },
+      {
+        "role": "主语",
+        "text": "as many books as stars",
+        "note": "真正主语，as...as 比较结构。"
+      },
+      {
+        "role": "定语",
+        "text": "in the sky",
+        "note": "作后置定语修饰 stars。“天上的”。"
+      }
+    ]
+  },
+  {
+    "id": "7B-01",
+    "book": "7下",
+    "page": 10,
+    "sentence": "In the evenings, Charlie sat with his grandparents in bed and listened to their stories.",
+    "translation": "晚上，查理和祖父母一起坐在床上，听他们讲故事。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "In the evenings",
+        "note": "时间状语，“在晚上”。"
+      },
+      {
+        "type": "主句",
+        "text": "Charlie sat with his grandparents in bed",
+        "note": "主语 Charlie + 谓语 sat + 伴随状语 with his grandparents + 地点状语 in bed。"
+      },
+      {
+        "type": "并列",
+        "text": "and listened to their stories",
+        "note": "and 连接的第二个并列谓语 listened to + 宾语 their stories。"
+      }
+    ],
+    "grammar": [
+      "and 连接并列谓语 sat ... and listened to ...",
+      "with his grandparents 介词短语作伴随状语",
+      "listen to 听（故事等）"
+    ],
+    "words": [
+      {
+        "w": "grandparent",
+        "pos": "n.",
+        "m": "祖父母（常用复数 grandparents）"
+      },
+      {
+        "w": "story",
+        "pos": "n.",
+        "m": "故事"
+      },
+      {
+        "w": "evening",
+        "pos": "n.",
+        "m": "傍晚；晚上"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "In the evenings",
+        "note": "时间状语，“在晚上”。"
+      },
+      {
+        "role": "主语",
+        "text": "Charlie",
+        "note": "句子主语。“查理”。"
+      },
+      {
+        "role": "谓语①",
+        "text": "sat",
+        "note": "第一个并列谓语。“坐”。"
+      },
+      {
+        "role": "状语",
+        "text": "with his grandparents / in bed",
+        "note": "伴随状语 + 地点状语。“和祖父母一起 / 在床上”。"
+      },
+      {
+        "role": "谓语②",
+        "text": "listened to",
+        "note": "and 连接的第二个并列谓语。“听”。"
+      },
+      {
+        "role": "宾语",
+        "text": "their stories",
+        "note": "listened to 的宾语。“他们的故事”。"
+      }
+    ]
+  },
+  {
+    "id": "7B-02",
+    "book": "7下",
+    "page": 18,
+    "sentence": "He remembered the words of Plato: \"Happiness springs from doing good and helping others.\"",
+    "translation": "他记起了柏拉图的话：“幸福源于行善与助人。”",
+    "analysis": [
+      {
+        "type": "主句",
+        "text": "He remembered the words of Plato",
+        "note": "主语 He + 谓语 remembered + 宾语 the words + 定语 of Plato（柏拉图的）。"
+      },
+      {
+        "type": "宾语",
+        "text": "\"Happiness springs from doing good and helping others.\"",
+        "note": "引号内为 the words 的具体内容（同位/引语）；其中主语 Happiness + 谓语 springs from + 宾语 doing good and helping others（两个动名词并列）。"
+      }
+    ],
+    "grammar": [
+      "the words of Plato 柏拉图的名言（of 短语作定语）",
+      "spring from... 源于……",
+      "doing good and helping others 两个动名词短语并列作介词 from 的宾语"
+    ],
+    "words": [
+      {
+        "w": "remember",
+        "pos": "v.",
+        "m": "记得；想起"
+      },
+      {
+        "w": "spring from",
+        "pos": "phr.",
+        "m": "源于；来自"
+      },
+      {
+        "w": "help",
+        "pos": "v.",
+        "m": "帮助"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "He",
+        "note": "句子主语。“他”。"
+      },
+      {
+        "role": "谓语",
+        "text": "remembered",
+        "note": "及物动词谓语，“记得”。"
+      },
+      {
+        "role": "宾语",
+        "text": "the words of Plato",
+        "note": "remembered 的宾语；of Plato 作定语。“柏拉图的话”。"
+      },
+      {
+        "role": "同位语/引语",
+        "text": "\"Happiness springs from doing good and helping others.\"",
+        "note": "the words 的具体内容（引语）。"
+      },
+      {
+        "role": "(引语)主语",
+        "text": "Happiness",
+        "note": "引语内主语。“幸福”。"
+      },
+      {
+        "role": "(引语)谓语",
+        "text": "springs from",
+        "note": "引语内谓语。“源于”。"
+      },
+      {
+        "role": "(引语)宾语",
+        "text": "doing good and helping others",
+        "note": "两个动名词短语并列作 from 的宾语。“行善与助人”。"
+      }
+    ]
+  },
+  {
+    "id": "7B-03",
+    "book": "7下",
+    "page": 25,
+    "sentence": "However, 86-year-old Zhang Shun was still about 100 metres from the finishing line.",
+    "translation": "然而，86岁的张顺仍距离终点线约100米。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "However",
+        "note": "转折副词，意为“然而”，承上启下。"
+      },
+      {
+        "type": "主句",
+        "text": "86-year-old Zhang Shun was still about 100 metres from the finishing line",
+        "note": "主语 86-year-old Zhang Shun（86岁的张顺）+ 系动词 was + 表语 about 100 metres + 状语 from the finishing line（距终点线）。"
+      }
+    ],
+    "grammar": [
+      "however 副词，表转折，常置于句首用逗号隔开",
+      "数词-名词-形容词 构成的复合词 86-year-old 作前置定语",
+      "about 100 metres from... 距……约100米"
+    ],
+    "words": [
+      {
+        "w": "however",
+        "pos": "adv.",
+        "m": "然而；不过"
+      },
+      {
+        "w": "finishing line",
+        "pos": "phr.",
+        "m": "终点线"
+      },
+      {
+        "w": "metre",
+        "pos": "n.",
+        "m": "米（美 meter）"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "However",
+        "note": "转折副词，“然而”，常句首逗号隔开。"
+      },
+      {
+        "role": "主语",
+        "text": "86-year-old Zhang Shun",
+        "note": "句子主语；86-year-old 复合形容词作前置定语。“86岁的张顺”。"
+      },
+      {
+        "role": "谓语",
+        "text": "was",
+        "note": "系动词。"
+      },
+      {
+        "role": "表语",
+        "text": "about 100 metres",
+        "note": "表语，“约100米”。"
+      },
+      {
+        "role": "状语",
+        "text": "from the finishing line",
+        "note": "距离状语，“距终点线”。"
+      }
+    ]
+  },
+  {
+    "id": "7B-04",
+    "book": "7下",
+    "page": 28,
+    "sentence": "As a child, Bethany Hamilton's dream was to become a surfer.",
+    "translation": "小时候，贝瑟尼·汉密尔顿的梦想是成为一名冲浪者。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "As a child",
+        "note": "as 介词短语作时间状语，意为“在孩童时期／小时候”。"
+      },
+      {
+        "type": "主句",
+        "text": "Bethany Hamilton's dream was to become a surfer",
+        "note": "主语 Bethany Hamilton's dream + 系动词 was + 表语 to become a surfer（不定式作表语，说明梦想的内容）。"
+      }
+    ],
+    "grammar": [
+      "as a child 作时间状语",
+      "主语 + be + to do 不定式作表语（说明内容/目的）",
+      "become a surfer 成为冲浪者"
+    ],
+    "words": [
+      {
+        "w": "dream",
+        "pos": "n.",
+        "m": "梦想"
+      },
+      {
+        "w": "become",
+        "pos": "v.",
+        "m": "成为"
+      },
+      {
+        "w": "surfer",
+        "pos": "n.",
+        "m": "冲浪者"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "As a child",
+        "note": "as 介词短语作时间状语，“小时候”。"
+      },
+      {
+        "role": "主语",
+        "text": "Bethany Hamilton's dream",
+        "note": "句子主语；Bethany Hamilton's 为所有格定语。“贝瑟尼·汉密尔顿的梦想”。"
+      },
+      {
+        "role": "谓语",
+        "text": "was",
+        "note": "系动词。"
+      },
+      {
+        "role": "表语",
+        "text": "to become a surfer",
+        "note": "不定式作表语，说明梦想内容。“成为一名冲浪者”。"
+      }
+    ]
+  },
+  {
+    "id": "7B-05",
+    "book": "7下",
+    "page": 30,
+    "sentence": "Walking, running, bike-riding, dancing, and any other forms of sports are all physical activities.",
+    "translation": "散步、跑步、骑行、跳舞以及任何其他形式的运动都是身体活动。",
+    "analysis": [
+      {
+        "type": "主语",
+        "text": "Walking, running, bike-riding, dancing, and any other forms of sports",
+        "note": "由四个动名词与名词短语并列构成的整体作主语；forms of sports 作定语修饰 any other forms。"
+      },
+      {
+        "type": "主句",
+        "text": "are all physical activities",
+        "note": "系动词 are + 表语 all physical activities；主语为复数，故用 are。"
+      }
+    ],
+    "grammar": [
+      "动名词（walking/running/riding/dancing）并列作主语，谓语动词用复数",
+      "any other forms of sports 运动的其他形式（of 短语作定语）",
+      "physical activities 身体活动"
+    ],
+    "words": [
+      {
+        "w": "physical",
+        "pos": "adj.",
+        "m": "身体的；物理的"
+      },
+      {
+        "w": "activity",
+        "pos": "n.",
+        "m": "活动"
+      },
+      {
+        "w": "form",
+        "pos": "n.",
+        "m": "形式"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "Walking, running, bike-riding, dancing, and any other forms of sports",
+        "note": "四个动名词 + 名词短语并列作整体主语；forms of sports 作定语。“散步、跑步、骑行、跳舞及其他运动形式”。"
+      },
+      {
+        "role": "谓语",
+        "text": "are",
+        "note": "系动词，主语为复数故用 are。"
+      },
+      {
+        "role": "表语",
+        "text": "all physical activities",
+        "note": "表语，“都是身体活动”。"
+      }
+    ]
+  },
+  {
+    "id": "7B-06",
+    "book": "7下",
+    "page": 34,
+    "sentence": "Known as the Steel Roses of China, the team is close to many people's hearts.",
+    "translation": "被誉为“中国铿锵玫瑰”的这支队伍，贴近许多人的心。",
+    "analysis": [
+      {
+        "type": "非谓语",
+        "text": "Known as the Steel Roses of China",
+        "note": "过去分词短语作状语/定语，相当于 which is known as...，意为“作为……而为人所知”；修饰 the team。"
+      },
+      {
+        "type": "主句",
+        "text": "the team is close to many people's hearts",
+        "note": "主语 the team + 系动词 is + 表语 close to many people's hearts（贴近许多人的心）。"
+      }
+    ],
+    "grammar": [
+      "be known as... 作为……而闻名／被称为",
+      "过去分词短语 Known as... 作状语（表原因/伴随）",
+      "be close to... 贴近……；与……亲近"
+    ],
+    "words": [
+      {
+        "w": "known as",
+        "pos": "phr.",
+        "m": "被称为；作为……而闻名"
+      },
+      {
+        "w": "steel",
+        "pos": "n./adj.",
+        "m": "钢；钢铁般的"
+      },
+      {
+        "w": "heart",
+        "pos": "n.",
+        "m": "心；心脏"
+      }
+    ],
+    "components": [
+      {
+        "role": "定语/状语",
+        "text": "Known as the Steel Roses of China",
+        "note": "过去分词短语，相当于 which is known as...，作定语/状语，修饰 the team。“被称为中国铿锵玫瑰”。"
+      },
+      {
+        "role": "主语",
+        "text": "the team",
+        "note": "句子主语。“这支队伍”。"
+      },
+      {
+        "role": "谓语",
+        "text": "is",
+        "note": "系动词。"
+      },
+      {
+        "role": "表语",
+        "text": "close to many people's hearts",
+        "note": "表语；many people's 作定语修饰 hearts。“贴近许多人的心”。"
+      }
+    ]
+  },
+  {
+    "id": "7B-07",
+    "book": "7下",
+    "page": 46,
+    "sentence": "In modern times, the world's first dietary goal was put forward by Sweden in 1968.",
+    "translation": "在现代，世界上首个膳食目标由瑞典于1968年提出。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "In modern times",
+        "note": "时间状语，“在现代”。"
+      },
+      {
+        "type": "主句",
+        "text": "the world's first dietary goal was put forward by Sweden in 1968",
+        "note": "被动语态：主语 the world's first dietary goal + 谓语 was put forward + 动作发出者 by Sweden + 时间状语 in 1968。"
+      }
+    ],
+    "grammar": [
+      "一般过去时被动语态 was + 过去分词 (put forward)",
+      "put forward 提出",
+      "by Sweden 引出动作执行者；in 1968 时间状语"
+    ],
+    "words": [
+      {
+        "w": "modern",
+        "pos": "adj.",
+        "m": "现代的"
+      },
+      {
+        "w": "dietary",
+        "pos": "adj.",
+        "m": "饮食的"
+      },
+      {
+        "w": "goal",
+        "pos": "n.",
+        "m": "目标"
+      },
+      {
+        "w": "put forward",
+        "pos": "phr.",
+        "m": "提出"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "In modern times",
+        "note": "时间状语，“在现代”。"
+      },
+      {
+        "role": "主语",
+        "text": "the world's first dietary goal",
+        "note": "句子主语；the world's first dietary 作定语。“世界上首个膳食目标”。"
+      },
+      {
+        "role": "谓语",
+        "text": "was put forward",
+        "note": "一般过去时被动语态。“被提出”。"
+      },
+      {
+        "role": "状语",
+        "text": "by Sweden / in 1968",
+        "note": "动作执行者 + 时间状语。“由瑞典 / 于1968年”。"
+      }
+    ]
+  },
+  {
+    "id": "7B-08",
+    "book": "7下",
+    "page": 49,
+    "sentence": "Folk tales have it that Emperor Huizong suffered from stomach pains after eating too much ice.",
+    "translation": "民间传说称，徽宗皇帝因吃太多冰而肚子疼。",
+    "analysis": [
+      {
+        "type": "主句",
+        "text": "Folk tales have it",
+        "note": "主语 Folk tales + 谓语 have + 形式宾语 it。"
+      },
+      {
+        "type": "宾语",
+        "text": "that Emperor Huizong suffered from stomach pains after eating too much ice",
+        "note": "that 引导宾语从句，作 it 的同位/真实宾语；从句中 after eating too much ice 是时间状语（after + 动名词）。"
+      }
+    ],
+    "grammar": [
+      "have it that... 传说……／据说……（it 为形式宾语，that 从句为真正宾语）",
+      "suffer from... 遭受……（痛苦）",
+      "after + 动名词 eating 作时间状语"
+    ],
+    "words": [
+      {
+        "w": "folk tale",
+        "pos": "phr.",
+        "m": "民间传说"
+      },
+      {
+        "w": "emperor",
+        "pos": "n.",
+        "m": "皇帝"
+      },
+      {
+        "w": "suffer",
+        "pos": "v.",
+        "m": "遭受；受苦"
+      },
+      {
+        "w": "stomach",
+        "pos": "n.",
+        "m": "胃；肚子"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "Folk tales",
+        "note": "句子主语。“民间传说”。"
+      },
+      {
+        "role": "谓语",
+        "text": "have",
+        "note": "及物动词谓语，后接形式宾语 it。"
+      },
+      {
+        "role": "形式宾语",
+        "text": "it",
+        "note": "形式宾语，真正的宾语是后面的 that 从句。"
+      },
+      {
+        "role": "真正宾语(从句)",
+        "text": "that Emperor Huizong suffered from stomach pains after eating too much ice",
+        "note": "that 引导宾语从句，作真正宾语。"
+      },
+      {
+        "role": "(从句)主语",
+        "text": "Emperor Huizong",
+        "note": "从句主语。“徽宗皇帝”。"
+      },
+      {
+        "role": "(从句)谓语",
+        "text": "suffered from",
+        "note": "从句谓语，“遭受”。"
+      },
+      {
+        "role": "(从句)宾语",
+        "text": "stomach pains",
+        "note": "suffered from 的宾语。“胃痛”。"
+      },
+      {
+        "role": "(从句)状语",
+        "text": "after eating too much ice",
+        "note": "after + 动名词作时间状语。“吃太多冰之后”。"
+      }
+    ]
+  },
+  {
+    "id": "7B-09",
+    "book": "7下",
+    "page": 74,
+    "sentence": "I'm proud to say that I'm from one of the most beautiful places in the world.",
+    "translation": "我很自豪地说，我来自世界上最美丽的地方之一。",
+    "analysis": [
+      {
+        "type": "主句",
+        "text": "I'm proud to say that ...",
+        "note": "主语 I + 系动词 am + 表语 proud + 不定式 to say 作原因/内容状语；"
+      },
+      {
+        "type": "宾语",
+        "text": "that I'm from one of the most beautiful places in the world",
+        "note": "that 引导宾语从句作 say 的宾语；one of the + 最高级 + 复数名词 表示“最……的……之一”。"
+      }
+    ],
+    "grammar": [
+      "be proud to do 自豪地做某事",
+      "that 引导宾语从句",
+      "one of the + 最高级 + 名词复数（最……之一）；in the world 定语"
+    ],
+    "words": [
+      {
+        "w": "proud",
+        "pos": "adj.",
+        "m": "骄傲的；自豪的"
+      },
+      {
+        "w": "beautiful",
+        "pos": "adj.",
+        "m": "美丽的"
+      },
+      {
+        "w": "place",
+        "pos": "n.",
+        "m": "地方"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "I",
+        "note": "句子主语。"
+      },
+      {
+        "role": "谓语",
+        "text": "am",
+        "note": "系动词。"
+      },
+      {
+        "role": "表语",
+        "text": "proud",
+        "note": "形容词表语，“自豪的”。"
+      },
+      {
+        "role": "状语",
+        "text": "to say that ...",
+        "note": "不定式作内容/原因状语。"
+      },
+      {
+        "role": "宾语(从句)",
+        "text": "that I'm from one of the most beautiful places in the world",
+        "note": "that 引导宾语从句，作 say 的宾语；one of the + 最高级 + 复数名词 表“最……之一”。"
+      },
+      {
+        "role": "(从句)表语",
+        "text": "from one of the most beautiful places in the world",
+        "note": "from 介词短语作表语；in the world 作定语。“来自世界上最美丽的地方之一”。"
+      }
+    ]
+  },
+  {
+    "id": "7B-10",
+    "book": "7下",
+    "page": 78,
+    "sentence": "The National Natural History Museum of China, the American Museum of Natural History, and the Natural History Museum in London are among the most famous ones in the world.",
+    "translation": "中国自然历史博物馆、美国自然历史博物馆和伦敦自然历史博物馆都是世界上最著名的博物馆之一。",
+    "analysis": [
+      {
+        "type": "主语",
+        "text": "The National Natural History Museum of China, the American Museum of Natural History, and the Natural History Museum in London",
+        "note": "三个并列的专有名词短语共同作主语；of China / of Natural History / in London 均为定语。"
+      },
+      {
+        "type": "主句",
+        "text": "are among the most famous ones in the world",
+        "note": "系动词 are + 表语 among the most famous ones（最著名的之一）；in the world 作定语。"
+      }
+    ],
+    "grammar": [
+      "三个并列名词短语作主语（整体为复数，用 are）",
+      "among the most famous ones 最著名的之中（one 指代 museum）",
+      "of/in 短语作后置定语"
+    ],
+    "words": [
+      {
+        "w": "museum",
+        "pos": "n.",
+        "m": "博物馆"
+      },
+      {
+        "w": "natural",
+        "pos": "adj.",
+        "m": "自然的"
+      },
+      {
+        "w": "famous",
+        "pos": "adj.",
+        "m": "著名的"
+      },
+      {
+        "w": "among",
+        "pos": "prep.",
+        "m": "在……之中"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "The National Natural History Museum of China, the American Museum of Natural History, and the Natural History Museum in London",
+        "note": "三个并列专有名词短语共同作主语（整体复数）；of China / of Natural History / in London 均为定语。“中、美、英三座自然历史博物馆”。"
+      },
+      {
+        "role": "谓语",
+        "text": "are",
+        "note": "系动词，主语为复数故用 are。"
+      },
+      {
+        "role": "表语",
+        "text": "among the most famous ones",
+        "note": "表语，ones 指代 museums。“最著名的之中”。"
+      },
+      {
+        "role": "定语",
+        "text": "in the world",
+        "note": "作后置定语修饰 ones。“世界上”。"
+      }
+    ]
+  },
+  {
+    "id": "7B-11",
+    "book": "7下",
+    "page": 82,
+    "sentence": "As my name suggests, I make rain for my plants and animals, such as monkeys, snakes and many kinds of flowers.",
+    "translation": "正如我的名字所示，我为我的植物和动物降雨，比如猴子、蛇和许多种花。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "As my name suggests",
+        "note": "as 引导定语从句/状语从句，意为“正如我的名字所示”，as 在从句中作 suggests 的宾语。"
+      },
+      {
+        "type": "主句",
+        "text": "I make rain for my plants and animals",
+        "note": "主语 I + 谓语 make + 宾语 rain + 对象状语 for my plants and animals。"
+      },
+      {
+        "type": "插语",
+        "text": "such as monkeys, snakes and many kinds of flowers",
+        "note": "such as 引出 examples，举例说明 animals。"
+      }
+    ],
+    "grammar": [
+      "as 引导方式/定语从句（as 作 suggests 的宾语），译作“正如”",
+      "make rain for... 为……降雨",
+      "such as 例如（列举）"
+    ],
+    "words": [
+      {
+        "w": "suggest",
+        "pos": "v.",
+        "m": "表明；建议"
+      },
+      {
+        "w": "rain",
+        "pos": "n./v.",
+        "m": "雨；下雨"
+      },
+      {
+        "w": "such as",
+        "pos": "phr.",
+        "m": "例如；比如"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "As my name suggests",
+        "note": "as 引导方式/定语从句，as 在从句中作 suggests 的宾语，“正如我的名字所示”。"
+      },
+      {
+        "role": "主语",
+        "text": "I",
+        "note": "句子主语。"
+      },
+      {
+        "role": "谓语",
+        "text": "make",
+        "note": "及物动词谓语，“制造 / 降下”。"
+      },
+      {
+        "role": "宾语",
+        "text": "rain",
+        "note": "make 的宾语。“雨”。"
+      },
+      {
+        "role": "状语",
+        "text": "for my plants and animals",
+        "note": "对象状语，“为我的植物和动物”。"
+      },
+      {
+        "role": "举例",
+        "text": "such as monkeys, snakes and many kinds of flowers",
+        "note": "such as 引出例子，说明 animals。“比如猴子、蛇和许多种花”。"
+      }
+    ]
+  },
+  {
+    "id": "7B-12",
+    "book": "7下",
+    "page": 115,
+    "sentence": "Research has shown that students learn best when they are actively engaged in the learning process.",
+    "translation": "研究表明，当学生积极参与学习过程时，他们学得最好。",
+    "analysis": [
+      {
+        "type": "主句",
+        "text": "Research has shown that ...",
+        "note": "主语 Research + 谓语 has shown + that 宾语从句。"
+      },
+      {
+        "type": "宾语",
+        "text": "that students learn best when they are actively engaged in the learning process",
+        "note": "that 引导宾语从句；其中 when 引导时间状语从句 when they are actively engaged in the learning process。"
+      }
+    ],
+    "grammar": [
+      "that 引导宾语从句（作 shown 的宾语）",
+      "when 引导时间状语从句",
+      "be engaged in... 参与……；learn best 学得最好（best 为副词最高级）"
+    ],
+    "words": [
+      {
+        "w": "research",
+        "pos": "n.",
+        "m": "研究；调查"
+      },
+      {
+        "w": "actively",
+        "pos": "adv.",
+        "m": "积极地"
+      },
+      {
+        "w": "engage",
+        "pos": "v.",
+        "m": "从事；使参与（be engaged in 参与）"
+      },
+      {
+        "w": "process",
+        "pos": "n.",
+        "m": "过程"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "Research",
+        "note": "句子主语。“研究”。"
+      },
+      {
+        "role": "谓语",
+        "text": "has shown",
+        "note": "现在完成时谓语。“表明”。"
+      },
+      {
+        "role": "宾语(从句)",
+        "text": "that students learn best when they are actively engaged in the learning process",
+        "note": "that 引导宾语从句，作 shown 的宾语。"
+      },
+      {
+        "role": "(从句)主语",
+        "text": "students",
+        "note": "从句主语。“学生”。"
+      },
+      {
+        "role": "(从句)谓语",
+        "text": "learn",
+        "note": "从句谓语。“学习”。"
+      },
+      {
+        "role": "(从句)状语",
+        "text": "best / when they are actively engaged in the learning process",
+        "note": "best 程度状语；when 引导时间状语从句。“最好 / 当他们积极参与学习过程时”。"
+      }
+    ]
+  },
+  {
+    "id": "8A-01",
+    "book": "8上",
+    "page": 7,
+    "sentence": "Although I only replied \"thank you\", it turned sunny in my heart.",
+    "translation": "虽然我只是回答了一句“谢谢”，但我的心里却变得如阳光般明媚。",
+    "analysis": [
+      {
+        "type": "让步状语从句",
+        "text": "Although I only replied \"thank you\"",
+        "note": "although 引导让步状语从句，表示“虽然……”。"
+      },
+      {
+        "type": "主句",
+        "text": "it turned sunny in my heart",
+        "note": "主语 it + 系动词 turned（变得）+ 表语 sunny + 状语 in my heart。"
+      }
+    ],
+    "grammar": [
+      "although 引导让步状语从句，主句前可加逗号",
+      "turn 作系动词，turn (become) + adj. 表示“变得……”（turned sunny 变得明媚）",
+      "in one's heart 在某人心里"
+    ],
+    "words": [
+      {
+        "w": "although",
+        "pos": "conj.",
+        "m": "虽然；尽管"
+      },
+      {
+        "w": "reply",
+        "pos": "v.",
+        "m": "回答；答复"
+      },
+      {
+        "w": "turn",
+        "pos": "v.(系动词)",
+        "m": "变得"
+      },
+      {
+        "w": "sunny",
+        "pos": "adj.",
+        "m": "晴朗的；明媚的"
+      },
+      {
+        "w": "heart",
+        "pos": "n.",
+        "m": "心；内心"
+      }
+    ],
+    "components": [
+      {
+        "role": "让步状语从句",
+        "text": "Although I only replied \"thank you\"",
+        "note": "although 引导让步状语从句；主句 I + 谓语 replied + 宾语 “thank you”。"
+      },
+      {
+        "role": "主语",
+        "text": "it",
+        "note": "主句主语（指代心情/天气等）。"
+      },
+      {
+        "role": "谓语",
+        "text": "turned",
+        "note": "系动词，turn + adj. 表“变得”."
+      },
+      {
+        "role": "表语",
+        "text": "sunny",
+        "note": "表语，“明媚的”。"
+      },
+      {
+        "role": "状语",
+        "text": "in my heart",
+        "note": "地点状语，“在我心里”。"
+      }
+    ]
+  },
+  {
+    "id": "8A-02",
+    "book": "8上",
+    "page": 21,
+    "sentence": "Not everyone thinks the way you think, knows the things you know, believes the things you believe, nor acts the way you would act.",
+    "translation": "不是每个人都像你这样思考，知道你所知道的事，相信你所相信的事，也不会像你那样行事。",
+    "analysis": [
+      {
+        "type": "主语",
+        "text": "Not everyone",
+        "note": "否定词 Not 修饰 everyone，构成部分否定（并非每个人）。"
+      },
+      {
+        "type": "并列谓语",
+        "text": "thinks ... , knows ... , believes ... , nor acts ...",
+        "note": "四个并列谓语由 nor 连接最后一项；think/know/believe/act 后均带省略关系代词的定语从句。"
+      },
+      {
+        "type": "定语从句(省略that)",
+        "text": "you think / you know / you believe / you would act",
+        "note": "分别修饰 the way 与 the things；关系代词在从句中作宾语故省略。"
+      }
+    ],
+    "grammar": [
+      "not everyone = 并非每个人（部分否定，不同于全否定 nobody）",
+      "the way (that) you think 中 that 引导的定语从句修饰 the way",
+      "nor 连接并列谓语，表示“也不……”（前面已否定，追加否定项）",
+      "定语从句中关系代词作宾语时可省略"
+    ],
+    "words": [
+      {
+        "w": "not everyone",
+        "pos": "部分否定",
+        "m": "并非每个人"
+      },
+      {
+        "w": "think",
+        "pos": "v.",
+        "m": "思考；认为"
+      },
+      {
+        "w": "believe",
+        "pos": "v.",
+        "m": "相信"
+      },
+      {
+        "w": "act",
+        "pos": "v.",
+        "m": "行动；行事"
+      },
+      {
+        "w": "nor",
+        "pos": "conj.",
+        "m": "也不（连接否定并列项）"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "Not everyone",
+        "note": "否定词 Not 修饰 everyone，构成部分否定“并非每个人”。"
+      },
+      {
+        "role": "谓语①",
+        "text": "thinks",
+        "note": "第一个并列谓语；后接定语从句 the way you think。"
+      },
+      {
+        "role": "定语从句①",
+        "text": "the way you think",
+        "note": "省略关系代词 that 的定语从句，修饰 the way。“像你这样思考”。"
+      },
+      {
+        "role": "谓语②",
+        "text": "knows",
+        "note": "第二个并列谓语；后接定语从句 the things you know。"
+      },
+      {
+        "role": "定语从句②",
+        "text": "the things you know",
+        "note": "省略 that 的定语从句，修饰 the things。“你所知道的事”。"
+      },
+      {
+        "role": "谓语③",
+        "text": "believes",
+        "note": "第三个并列谓语；后接定语从句 the things you believe。"
+      },
+      {
+        "role": "定语从句③",
+        "text": "the things you believe",
+        "note": "省略 that 的定语从句。“你所相信的事”。"
+      },
+      {
+        "role": "谓语④",
+        "text": "nor acts",
+        "note": "nor 连接的第四个并列谓语；后接定语从句 the way you would act。“也不像你那样行事”。"
+      },
+      {
+        "role": "定语从句④",
+        "text": "the way you would act",
+        "note": "省略 that 的定语从句，修饰 the way。“你那样行事的方式”。"
+      }
+    ]
+  },
+  {
+    "id": "8A-03",
+    "book": "8上",
+    "page": 55,
+    "sentence": "When I got home, I was so tired that I gave up on cooking.",
+    "translation": "当我回到家时，我累得放弃了做饭。",
+    "analysis": [
+      {
+        "type": "时间状语从句",
+        "text": "When I got home",
+        "note": "when 引导时间状语从句。"
+      },
+      {
+        "type": "主句",
+        "text": "I was so tired that I gave up on cooking",
+        "note": "主语 I + 系动词 was + 表语 so tired + that 结果状语从句。"
+      },
+      {
+        "type": "结果状语从句",
+        "text": "that I gave up on cooking",
+        "note": "so...that 引导结果状语从句。"
+      }
+    ],
+    "grammar": [
+      "when 引导时间状语从句",
+      "so + adj. + that... 如此……以至于……（that 引导结果状语从句）",
+      "give up on (doing) sth. 放弃（做）某事"
+    ],
+    "words": [
+      {
+        "w": "when",
+        "pos": "conj.",
+        "m": "当……时"
+      },
+      {
+        "w": "tired",
+        "pos": "adj.",
+        "m": "疲倦的；累的"
+      },
+      {
+        "w": "so...that",
+        "pos": "结构",
+        "m": "如此……以至于"
+      },
+      {
+        "w": "give up on",
+        "pos": "phr.",
+        "m": "放弃"
+      },
+      {
+        "w": "cooking",
+        "pos": "n.",
+        "m": "做饭；烹饪"
+      }
+    ],
+    "components": [
+      {
+        "role": "时间状语从句",
+        "text": "When I got home",
+        "note": "when 引导时间状语从句；I + 谓语 got home。“当我回到家时”。"
+      },
+      {
+        "role": "主语",
+        "text": "I",
+        "note": "主句主语。"
+      },
+      {
+        "role": "谓语",
+        "text": "was",
+        "note": "系动词。"
+      },
+      {
+        "role": "表语",
+        "text": "so tired",
+        "note": "so + adj. 表语，“如此累”。"
+      },
+      {
+        "role": "结果状语从句",
+        "text": "that I gave up on cooking",
+        "note": "so...that 引导结果状语从句；I + 谓语 gave up on + 宾语 cooking。“以至于我放弃了做饭”。"
+      }
+    ]
+  },
+  {
+    "id": "8A-04",
+    "book": "8上",
+    "page": 55,
+    "sentence": "As I always make digital payments in China, I never carry my wallet.",
+    "translation": "因为在中国我总是用数字支付，所以我从不带钱包。",
+    "analysis": [
+      {
+        "type": "原因状语从句",
+        "text": "As I always make digital payments in China",
+        "note": "as 引导原因状语从句，语气弱于 because。"
+      },
+      {
+        "type": "主句",
+        "text": "I never carry my wallet",
+        "note": "主语 I + 状语 never + 谓语 carry + 宾语 my wallet。"
+      }
+    ],
+    "grammar": [
+      "as 引导原因状语从句（表“因为、由于”，语气较弱）",
+      "make digital payments 进行数字支付",
+      "carry one's wallet 随身携带钱包"
+    ],
+    "words": [
+      {
+        "w": "as",
+        "pos": "conj.",
+        "m": "因为；由于"
+      },
+      {
+        "w": "digital",
+        "pos": "adj.",
+        "m": "数字的"
+      },
+      {
+        "w": "payment",
+        "pos": "n.",
+        "m": "支付；付款"
+      },
+      {
+        "w": "wallet",
+        "pos": "n.",
+        "m": "钱包"
+      },
+      {
+        "w": "carry",
+        "pos": "v.",
+        "m": "携带"
+      }
+    ],
+    "components": [
+      {
+        "role": "原因状语从句",
+        "text": "As I always make digital payments in China",
+        "note": "as 引导原因状语从句（语气较弱）；I + 谓语 make + 宾语 digital payments + 状语 in China。“因为在中国我总用数字支付”。"
+      },
+      {
+        "role": "主语",
+        "text": "I",
+        "note": "主句主语。"
+      },
+      {
+        "role": "状语",
+        "text": "never",
+        "note": "频度否定状语，“从不”。"
+      },
+      {
+        "role": "谓语",
+        "text": "carry",
+        "note": "及物动词谓语。“携带”。"
+      },
+      {
+        "role": "宾语",
+        "text": "my wallet",
+        "note": "carry 的宾语。“我的钱包”。"
+      }
+    ]
+  },
+  {
+    "id": "8A-05",
+    "book": "8上",
+    "page": 87,
+    "sentence": "That night, I was sleeping when the ground shook very hard.",
+    "translation": "那天夜里，我正在睡觉，突然大地剧烈地震动起来。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "That night",
+        "note": "时间状语，说明背景。"
+      },
+      {
+        "type": "主句(过去进行时)",
+        "text": "I was sleeping",
+        "note": "过去进行时，表示过去某时刻正在进行的动作。"
+      },
+      {
+        "type": "时间状语从句(突发)",
+        "text": "when the ground shook very hard",
+        "note": "when 在此表“正在做某事，这时突然……”，从句用一般过去时。"
+      }
+    ],
+    "grammar": [
+      "过去进行时 (was sleeping) 表示过去某一刻正在进行的动作",
+      "when 引导的时间状语从句在此表“正在……这时突然发生另一事”（从句用一般过去时）",
+      "shake hard 剧烈震动"
+    ],
+    "words": [
+      {
+        "w": "that night",
+        "pos": "副词短语",
+        "m": "那天夜里"
+      },
+      {
+        "w": "sleep",
+        "pos": "v.",
+        "m": "睡觉（was sleeping 过去进行时）"
+      },
+      {
+        "w": "when",
+        "pos": "conj.",
+        "m": "当……时（此处表突发）"
+      },
+      {
+        "w": "ground",
+        "pos": "n.",
+        "m": "地面；大地"
+      },
+      {
+        "w": "shake",
+        "pos": "v.",
+        "m": "摇动；震动"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "That night",
+        "note": "时间状语，“那天夜里”。"
+      },
+      {
+        "role": "主语",
+        "text": "I",
+        "note": "主句主语。"
+      },
+      {
+        "role": "谓语",
+        "text": "was sleeping",
+        "note": "过去进行时，表过去某刻正在进行的动作。“正在睡觉”。"
+      },
+      {
+        "role": "时间状语从句(突发)",
+        "text": "when the ground shook very hard",
+        "note": "when 在此表“正在……这时突然……”；the ground + 谓语 shook + 状语 very hard。“大地剧烈震动”。"
+      }
+    ]
+  },
+  {
+    "id": "8A-06",
+    "book": "8上",
+    "page": 87,
+    "sentence": "After a night of living between hope and fear, we had no thoughts of things to come.",
+    "translation": "在充满希望与恐惧的一夜之后，我们对将要发生的事毫无思绪。",
+    "analysis": [
+      {
+        "type": "时间状语",
+        "text": "After a night of living between hope and fear",
+        "note": "after 介词短语作时间状语。"
+      },
+      {
+        "type": "主句",
+        "text": "we had no thoughts of things to come",
+        "note": "主语 we + 谓语 had + 宾语 no thoughts + 定语 of things to come。"
+      },
+      {
+        "type": "后置定语",
+        "text": "to come",
+        "note": "不定式 to come 修饰 things，things to come = 将要发生的事。"
+      }
+    ],
+    "grammar": [
+      "after + 名词短语 作时间状语",
+      "between A and B 在 A 与 B 之间",
+      "things to come 不定式 to come 作后置定语，表将来",
+      "have no thoughts of... 对……毫无想法"
+    ],
+    "words": [
+      {
+        "w": "after",
+        "pos": "prep.",
+        "m": "在……之后"
+      },
+      {
+        "w": "fear",
+        "pos": "n.",
+        "m": "恐惧；害怕"
+      },
+      {
+        "w": "hope",
+        "pos": "n.",
+        "m": "希望"
+      },
+      {
+        "w": "thought",
+        "pos": "n.",
+        "m": "想法；思绪（no thoughts 毫无思绪）"
+      },
+      {
+        "w": "to come",
+        "pos": "不定式",
+        "m": "即将到来的（作后置定语）"
+      }
+    ],
+    "components": [
+      {
+        "role": "时间状语",
+        "text": "After a night of living between hope and fear",
+        "note": "after 介词短语作时间状语，“在充满希望与恐惧的一夜之后”。"
+      },
+      {
+        "role": "主语",
+        "text": "we",
+        "note": "句子主语。"
+      },
+      {
+        "role": "谓语",
+        "text": "had",
+        "note": "及物动词谓语。“有”。"
+      },
+      {
+        "role": "宾语",
+        "text": "no thoughts",
+        "note": "had 的宾语，“毫无思绪”。"
+      },
+      {
+        "role": "定语",
+        "text": "of things to come",
+        "note": "of 短语作定语；to come 不定式作后置定语修饰 things，“将要发生的事”。"
+      }
+    ]
+  },
+  {
+    "id": "8A-07",
+    "book": "8上",
+    "page": 91,
+    "sentence": "Warning times for storms in China have been increased to 42 minutes, with more than 90% being correct.",
+    "translation": "中国对风暴的预警时间已提高到 42 分钟，其中超过 90% 是准确的。",
+    "analysis": [
+      {
+        "type": "主句(被动)",
+        "text": "Warning times for storms in China have been increased to 42 minutes",
+        "note": "主语 Warning times + 谓语 have been increased（现在完成时被动态）+ 状语 to 42 minutes。"
+      },
+      {
+        "type": "伴随状语",
+        "text": "with more than 90% being correct",
+        "note": "with 复合结构（宾语 + 现在分词）作伴随/补充状语。"
+      }
+    ],
+    "grammar": [
+      "现在完成时被动语态 have been increased",
+      "increase...to... 把……提高到……",
+      "with + 宾语 + doing 复合结构作伴随/补充状语",
+      "more than 多于；超过"
+    ],
+    "words": [
+      {
+        "w": "warning",
+        "pos": "n.",
+        "m": "警告；预警（warning times 预警时间）"
+      },
+      {
+        "w": "storm",
+        "pos": "n.",
+        "m": "暴风雨；风暴"
+      },
+      {
+        "w": "increase",
+        "pos": "v.",
+        "m": "增加；提高"
+      },
+      {
+        "w": "with 复合结构",
+        "pos": "结构",
+        "m": "with + 宾语 + 分词（作伴随状语）"
+      },
+      {
+        "w": "correct",
+        "pos": "adj.",
+        "m": "正确的；准确的"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "Warning times",
+        "note": "句子主语；for storms in China 作定语。“预警时间”。"
+      },
+      {
+        "role": "定语",
+        "text": "for storms in China",
+        "note": "介词短语作后置定语修饰 times。“中国风暴的”。"
+      },
+      {
+        "role": "谓语",
+        "text": "have been increased",
+        "note": "现在完成时被动语态。“已被提高到”。"
+      },
+      {
+        "role": "状语",
+        "text": "to 42 minutes",
+        "note": "程度/结果状语，“到42分钟”。"
+      },
+      {
+        "role": "伴随状语",
+        "text": "with more than 90% being correct",
+        "note": "with + 宾语 + 现在分词 复合结构作伴随/补充状语，“其中超过90%准确”。"
+      }
+    ]
+  },
+  {
+    "id": "8A-08",
+    "book": "8上",
+    "page": 94,
+    "sentence": "During the 2021 Shanghai Fashion Week, a young, slim and confident woman with an iron leg drew everyone's attention.",
+    "translation": "在 2021 年上海时装周期间，一位年轻、苗条且自信、装着铁腿的女子吸引了所有人的目光。",
+    "analysis": [
+      {
+        "type": "时间状语",
+        "text": "During the 2021 Shanghai Fashion Week",
+        "note": "during + 时间段 作时间状语。"
+      },
+      {
+        "type": "主句",
+        "text": "a young, slim and confident woman with an iron leg drew everyone's attention",
+        "note": "主语 woman（前置定语 young/slim/confident 与后置定语 with an iron leg）+ 谓语 drew + 宾语 everyone's attention。"
+      }
+    ],
+    "grammar": [
+      "during + 时间段 作时间状语",
+      "多个并列形容词前置修饰 woman",
+      "with an iron leg 介词短语作后置定语修饰 woman",
+      "draw one's attention 吸引某人的注意"
+    ],
+    "words": [
+      {
+        "w": "during",
+        "pos": "prep.",
+        "m": "在……期间"
+      },
+      {
+        "w": "fashion week",
+        "pos": "n.",
+        "m": "时装周"
+      },
+      {
+        "w": "slim",
+        "pos": "adj.",
+        "m": "苗条的；纤细的"
+      },
+      {
+        "w": "confident",
+        "pos": "adj.",
+        "m": "自信的"
+      },
+      {
+        "w": "iron",
+        "pos": "adj.",
+        "m": "铁的（iron leg 铁腿/义肢）"
+      },
+      {
+        "w": "draw one's attention",
+        "pos": "phr.",
+        "m": "吸引某人的注意"
+      }
+    ],
+    "components": [
+      {
+        "role": "时间状语",
+        "text": "During the 2021 Shanghai Fashion Week",
+        "note": "during + 时间段作时间状语，“在2021上海时装周期间”。"
+      },
+      {
+        "role": "主语",
+        "text": "a young, slim and confident woman with an iron leg",
+        "note": "句子主语；young/slim/confident 并列前置定语，with an iron leg 后置定语。“一位年轻苗条自信、装着铁腿的女子”。"
+      },
+      {
+        "role": "谓语",
+        "text": "drew",
+        "note": "及物动词谓语，“吸引”。"
+      },
+      {
+        "role": "宾语",
+        "text": "everyone's attention",
+        "note": "draw 的宾语；everyone's 作定语。“所有人的目光”。"
+      }
+    ]
+  },
+  {
+    "id": "8A-09",
+    "book": "8上",
+    "page": 95,
+    "sentence": "With the support of her family and friends, Niu Yu slowly came out from the shadows.",
+    "translation": "在家人和朋友的支持下，牛钰慢慢走出了阴影。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "With the support of her family and friends",
+        "note": "with 复合结构作伴随/条件状语。"
+      },
+      {
+        "type": "主句",
+        "text": "Niu Yu slowly came out from the shadows",
+        "note": "主语 Niu Yu + 状语 slowly + 谓语 came out + 状语 from the shadows。"
+      }
+    ],
+    "grammar": [
+      "with the support of... 在……的支持下（with 复合结构）",
+      "come out from the shadows 走出阴影（喻摆脱低谷）",
+      "slowly 副词修饰谓语"
+    ],
+    "words": [
+      {
+        "w": "with the support of",
+        "pos": "phr.",
+        "m": "在……的支持下"
+      },
+      {
+        "w": "support",
+        "pos": "n.",
+        "m": "支持"
+      },
+      {
+        "w": "slowly",
+        "pos": "adv.",
+        "m": "慢慢地"
+      },
+      {
+        "w": "come out",
+        "pos": "phr.",
+        "m": "出来；摆脱"
+      },
+      {
+        "w": "shadow",
+        "pos": "n.",
+        "m": "阴影"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "With the support of her family and friends",
+        "note": "with 复合结构作伴随/条件状语，“在家人和朋友的支持下”。"
+      },
+      {
+        "role": "主语",
+        "text": "Niu Yu",
+        "note": "句子主语，“牛钰”。"
+      },
+      {
+        "role": "状语",
+        "text": "slowly",
+        "note": "副词作状语，修饰谓语，“慢慢地”。"
+      },
+      {
+        "role": "谓语",
+        "text": "came out",
+        "note": "不及物短语谓语，“走出”。"
+      },
+      {
+        "role": "状语",
+        "text": "from the shadows",
+        "note": "地点状语，“从阴影中”。"
+      }
+    ]
+  },
+  {
+    "id": "8A-10",
+    "book": "8上",
+    "page": 123,
+    "sentence": "Despite being far away from my family, I make sure to get in touch with them through regular phone calls and video calls.",
+    "translation": "尽管远离家人，我一定通过定期的电话和视频通话与他们保持联系。",
+    "analysis": [
+      {
+        "type": "让步状语",
+        "text": "Despite being far away from my family",
+        "note": "despite 介词 + 动名词短语作让步状语。"
+      },
+      {
+        "type": "主句",
+        "text": "I make sure to get in touch with them through regular phone calls and video calls",
+        "note": "主语 I + 谓语 make sure + (to do) 宾语；through 介词短语作方式状语。"
+      }
+    ],
+    "grammar": [
+      "despite 为介词，后接名词/动名词，表“尽管”",
+      "be far away from 远离",
+      "make sure to do 确保做；一定做",
+      "get in touch with 与……保持联系",
+      "through 通过（方式状语）"
+    ],
+    "words": [
+      {
+        "w": "despite",
+        "pos": "prep.",
+        "m": "尽管；不管"
+      },
+      {
+        "w": "far away from",
+        "pos": "phr.",
+        "m": "远离"
+      },
+      {
+        "w": "make sure",
+        "pos": "phr.",
+        "m": "确保；一定"
+      },
+      {
+        "w": "get in touch with",
+        "pos": "phr.",
+        "m": "与……联系"
+      },
+      {
+        "w": "regular",
+        "pos": "adj.",
+        "m": "定期的；规律的"
+      }
+    ],
+    "components": [
+      {
+        "role": "让步状语",
+        "text": "Despite being far away from my family",
+        "note": "despite 介词 + 动名词作让步状语，“尽管远离家人”。"
+      },
+      {
+        "role": "主语",
+        "text": "I",
+        "note": "主句主语。"
+      },
+      {
+        "role": "谓语",
+        "text": "make sure",
+        "note": "短语谓语，“确保 / 一定”。"
+      },
+      {
+        "role": "宾语(不定式)",
+        "text": "to get in touch with them",
+        "note": "make sure 的宾语（不定式）。“与他们保持联系”。"
+      },
+      {
+        "role": "状语",
+        "text": "through regular phone calls and video calls",
+        "note": "方式状语，“通过定期的电话和视频通话”。"
+      }
+    ]
+  },
+  {
+    "id": "8A-11",
+    "book": "8上",
+    "page": 14,
+    "sentence": "At that time, no one from Asia had ever run the 100 m race in less than 10 seconds.",
+    "translation": "那时，还没有任何一个亚洲人曾在 10 秒内跑完 100 米。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "At that time",
+        "note": "时间状语。"
+      },
+      {
+        "type": "主句(过去完成时否定)",
+        "text": "no one from Asia had ever run the 100 m race in less than 10 seconds",
+        "note": "主语 no one + 定语 from Asia + 谓语 had ever run（过去完成时）+ 宾语 + 状语 in less than 10 seconds。"
+      }
+    ],
+    "grammar": [
+      "过去完成时 had run 表示“过去的过去”",
+      "no one from Asia 来自亚洲的没有人（部分限定）",
+      "ever 用于否定/疑问句表“曾经”",
+      "in less than 10 seconds 在不到 10 秒内（less than 少于）"
+    ],
+    "words": [
+      {
+        "w": "at that time",
+        "pos": "副词短语",
+        "m": "那时；当时"
+      },
+      {
+        "w": "no one",
+        "pos": "pron.",
+        "m": "没有人"
+      },
+      {
+        "w": "Asia",
+        "pos": "n.",
+        "m": "亚洲"
+      },
+      {
+        "w": "run the race",
+        "pos": "phr.",
+        "m": "跑（这场）比赛"
+      },
+      {
+        "w": "in less than",
+        "pos": "phr.",
+        "m": "在少于……之内"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "At that time",
+        "note": "时间状语，“那时”。"
+      },
+      {
+        "role": "主语",
+        "text": "no one",
+        "note": "句子主语；from Asia 作后置定语。“来自亚洲的没有人”。"
+      },
+      {
+        "role": "定语",
+        "text": "from Asia",
+        "note": "介词短语作后置定语修饰 no one。“来自亚洲的”。"
+      },
+      {
+        "role": "谓语",
+        "text": "had ever run",
+        "note": "过去完成时谓语，“曾在……跑过”。"
+      },
+      {
+        "role": "宾语",
+        "text": "the 100 m race",
+        "note": "run 的宾语。“100米比赛”。"
+      },
+      {
+        "role": "状语",
+        "text": "in less than 10 seconds",
+        "note": "时间状语，“在不到10秒内”。"
+      }
+    ]
+  },
+  {
+    "id": "8A-12",
+    "book": "8上",
+    "page": 23,
+    "sentence": "Here and there, over the grass, stand beautiful flowers, like stars.",
+    "translation": "在草地上，到处矗立着美丽的花朵，宛如星星。",
+    "analysis": [
+      {
+        "type": "地点状语",
+        "text": "Here and there, over the grass",
+        "note": "地点状语前置，引起完全倒装。"
+      },
+      {
+        "type": "主句(完全倒装)",
+        "text": "stand beautiful flowers, like stars",
+        "note": "谓语动词 stand 置于主语 beautiful flowers 之前（完全倒装）；like stars 为比喻状语。"
+      }
+    ],
+    "grammar": [
+      "完全倒装：地点状语 Here and there / over the grass 前置，系动词 stand 提到主语 flowers 前",
+      "like stars 介词短语作方式/比喻状语",
+      "here and there 到处；四处"
+    ],
+    "words": [
+      {
+        "w": "here and there",
+        "pos": "phr.",
+        "m": "到处；处处"
+      },
+      {
+        "w": "over",
+        "pos": "prep.",
+        "m": "在……之上（over the grass 在草地上方）"
+      },
+      {
+        "w": "stand",
+        "pos": "v.",
+        "m": "站立；矗立"
+      },
+      {
+        "w": "beautiful",
+        "pos": "adj.",
+        "m": "美丽的"
+      },
+      {
+        "w": "like",
+        "pos": "prep.",
+        "m": "像；如同"
+      }
+    ],
+    "components": [
+      {
+        "role": "地点状语",
+        "text": "Here and there, over the grass",
+        "note": "地点状语前置，引起完全倒装。“到处 / 在草地上”。"
+      },
+      {
+        "role": "谓语",
+        "text": "stand",
+        "note": "谓语动词前置（完全倒装），“矗立”。"
+      },
+      {
+        "role": "主语",
+        "text": "beautiful flowers",
+        "note": "主语置于谓语之后；beautiful 为前置定语。“美丽的花朵”。"
+      },
+      {
+        "role": "状语",
+        "text": "like stars",
+        "note": "比喻/方式状语，“宛如星星”。"
+      }
+    ]
+  },
+  {
+    "id": "8B-01",
+    "book": "8下",
+    "page": 8,
+    "sentence": "I still remember my first summer as a \"spiderman\". It was a day much hotter than today!",
+    "translation": "我仍然记得我作为“蜘蛛人”的第一个夏天。那是一个比今天热得多的日子！",
+    "analysis": [
+      {
+        "type": "句1主句",
+        "text": "I still remember my first summer as a \"spiderman\"",
+        "note": "主语 I + 状语 still + 谓语 remember + 宾语 my first summer + 宾补 as a 'spiderman'。"
+      },
+      {
+        "type": "句2主句",
+        "text": "It was a day much hotter than today",
+        "note": "主语 It + 系动词 was + 表语 a day + 比较级定语 much hotter than today。"
+      }
+    ],
+    "grammar": [
+      "remember + 宾语 + as... 把……当作……来记得",
+      "much hotter than... 比较级（much 修饰比较级 hotter）",
+      "than today 比较状语"
+    ],
+    "words": [
+      {
+        "w": "still",
+        "pos": "adv.",
+        "m": "仍然"
+      },
+      {
+        "w": "remember",
+        "pos": "v.",
+        "m": "记得；记住"
+      },
+      {
+        "w": "spiderman",
+        "pos": "n.",
+        "m": "蜘蛛人（高空作业者戏称）"
+      },
+      {
+        "w": "much hotter",
+        "pos": "比较级",
+        "m": "热得多（much 修饰比较级）"
+      },
+      {
+        "w": "than",
+        "pos": "conj.",
+        "m": "比"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语(句1)",
+        "text": "I",
+        "note": "第一句主语。“我”。"
+      },
+      {
+        "role": "状语(句1)",
+        "text": "still",
+        "note": "状语，“仍然”。"
+      },
+      {
+        "role": "谓语(句1)",
+        "text": "remember",
+        "note": "谓语，“记得”。"
+      },
+      {
+        "role": "宾语(句1)",
+        "text": "my first summer",
+        "note": "remember 的宾语。“我第一个夏天”。"
+      },
+      {
+        "role": "宾补(句1)",
+        "text": "as a \"spiderman\"",
+        "note": "介词短语作宾语补足语，“作为‘蜘蛛人’”。"
+      },
+      {
+        "role": "主语(句2)",
+        "text": "It",
+        "note": "第二句主语，指代 that day。“那（一天）”。"
+      },
+      {
+        "role": "谓语(句2)",
+        "text": "was",
+        "note": "系动词。"
+      },
+      {
+        "role": "表语(句2)",
+        "text": "a day much hotter than today",
+        "note": "表语；much hotter than today 比较级作定语。“比今天热得多的日子”。"
+      }
+    ]
+  },
+  {
+    "id": "8B-02",
+    "book": "8下",
+    "page": 16,
+    "sentence": "If you lived in the mid-1300s, you might have been a mouse catcher.",
+    "translation": "如果你生活在 14 世纪 30 年代，你也许曾是个捕鼠人。",
+    "analysis": [
+      {
+        "type": "条件状语从句(虚拟)",
+        "text": "If you lived in the mid-1300s",
+        "note": "if 引导与过去事实相反的条件状语从句（用一般过去时 lived）。"
+      },
+      {
+        "type": "主句(虚拟)",
+        "text": "you might have been a mouse catcher",
+        "note": "主语 you + 谓语 might have been（对过去的虚拟）+ 表语。"
+      }
+    ],
+    "grammar": [
+      "虚拟语气：if 从句用一般过去时（lived）表与过去事实相反，主句用 might have been 表“过去可能曾是”",
+      "the mid-1300s 14 世纪 30 年代",
+      "mouse catcher 捕鼠人"
+    ],
+    "words": [
+      {
+        "w": "if",
+        "pos": "conj.",
+        "m": "如果（此处引导虚拟条件）"
+      },
+      {
+        "w": "live",
+        "pos": "v.",
+        "m": "生活；居住"
+      },
+      {
+        "w": "mid-1300s",
+        "pos": "n.",
+        "m": "14 世纪 30 年代"
+      },
+      {
+        "w": "might have been",
+        "pos": "虚拟结构",
+        "m": "也许曾（对过去的虚拟）"
+      },
+      {
+        "w": "mouse catcher",
+        "pos": "n.",
+        "m": "捕鼠人"
+      }
+    ],
+    "components": [
+      {
+        "role": "条件状语从句(虚拟)",
+        "text": "If you lived in the mid-1300s",
+        "note": "if 引导与过去事实相反的条件状语从句（用一般过去时 lived）；you + 谓语 lived + 状语 in the mid-1300s。“如果你生活在14世纪30年代”。"
+      },
+      {
+        "role": "主语",
+        "text": "you",
+        "note": "主句主语。"
+      },
+      {
+        "role": "谓语",
+        "text": "might have been",
+        "note": "对过去的虚拟语气，“也许曾（是）”。"
+      },
+      {
+        "role": "表语",
+        "text": "a mouse catcher",
+        "note": "表语，“一个捕鼠人”。"
+      }
+    ]
+  },
+  {
+    "id": "8B-03",
+    "book": "8下",
+    "page": 29,
+    "sentence": "They sometimes do a thing just because they don't want to be left out.",
+    "translation": "他们有时做某事，仅仅是因为他们不想被冷落。",
+    "analysis": [
+      {
+        "type": "主句",
+        "text": "They sometimes do a thing",
+        "note": "主语 They + 状语 sometimes + 谓语 do + 宾语 a thing。"
+      },
+      {
+        "type": "原因状语从句",
+        "text": "just because they don't want to be left out",
+        "note": "because 引导原因状语从句，内含被动不定式 to be left out。"
+      }
+    ],
+    "grammar": [
+      "because 引导原因状语从句",
+      "just 修饰 because，表“仅仅因为”",
+      "want to be left out 想被冷落（被动不定式）；be left out 被忽略/被冷落"
+    ],
+    "words": [
+      {
+        "w": "sometimes",
+        "pos": "adv.",
+        "m": "有时"
+      },
+      {
+        "w": "just",
+        "pos": "adv.",
+        "m": "仅仅；只是"
+      },
+      {
+        "w": "because",
+        "pos": "conj.",
+        "m": "因为"
+      },
+      {
+        "w": "want",
+        "pos": "v.",
+        "m": "想要（want to do）"
+      },
+      {
+        "w": "be left out",
+        "pos": "phr.",
+        "m": "被冷落；被忽略"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "They",
+        "note": "句子主语。“他们”。"
+      },
+      {
+        "role": "状语",
+        "text": "sometimes",
+        "note": "频度状语，“有时”。"
+      },
+      {
+        "role": "谓语",
+        "text": "do",
+        "note": "及物动词谓语。“做”。"
+      },
+      {
+        "role": "宾语",
+        "text": "a thing",
+        "note": "do 的宾语。“一件事”。"
+      },
+      {
+        "role": "原因状语从句",
+        "text": "just because they don't want to be left out",
+        "note": "because 引导原因状语从句；just 修饰 because。they + 谓语 don't want + 宾语 to be left out（被动不定式）。“仅仅是因为他们不想被冷落”。"
+      }
+    ]
+  },
+  {
+    "id": "8B-04",
+    "book": "8下",
+    "page": 33,
+    "sentence": "When one door closes, another opens.",
+    "translation": "当一扇门关闭时，另一扇门会打开。（比喻：失之东隅，收之桑榆。）",
+    "analysis": [
+      {
+        "type": "时间状语从句",
+        "text": "When one door closes",
+        "note": "when 引导时间状语从句。"
+      },
+      {
+        "type": "主句",
+        "text": "another opens",
+        "note": "主语 another + 谓语 opens。"
+      }
+    ],
+    "grammar": [
+      "when 引导时间状语从句",
+      "one...another... 一个……另一个……（不定代词对应）",
+      "close / open 反义动词"
+    ],
+    "words": [
+      {
+        "w": "when",
+        "pos": "conj.",
+        "m": "当……时"
+      },
+      {
+        "w": "door",
+        "pos": "n.",
+        "m": "门"
+      },
+      {
+        "w": "close",
+        "pos": "v.",
+        "m": "关闭"
+      },
+      {
+        "w": "another",
+        "pos": "pron.",
+        "m": "另一个"
+      },
+      {
+        "w": "open",
+        "pos": "v.",
+        "m": "打开"
+      }
+    ],
+    "components": [
+      {
+        "role": "时间状语从句",
+        "text": "When one door closes",
+        "note": "when 引导时间状语从句；one door + 谓语 closes。“当一扇门关闭时”。"
+      },
+      {
+        "role": "主语(主句)",
+        "text": "another",
+        "note": "主句主语，不定代词，“另一扇门”。"
+      },
+      {
+        "role": "谓语(主句)",
+        "text": "opens",
+        "note": "主句谓语，“打开”。"
+      }
+    ]
+  },
+  {
+    "id": "8B-05",
+    "book": "8下",
+    "page": 48,
+    "sentence": "\"I'm not strong enough to try again,\" he thought.",
+    "translation": "“我不够强壮，无法再试一次，”他想。",
+    "analysis": [
+      {
+        "type": "报道分句",
+        "text": "\"I'm not strong enough to try again,\" he thought",
+        "note": "直接引语 + 主语 he + 谓语 thought（言语报道分句）。"
+      },
+      {
+        "type": "引语内主句",
+        "text": "I'm not strong enough to try again",
+        "note": "主语 I + 系动词 am not + 表语 strong + enough to try again（enough 后置 + 结果不定式）。"
+      }
+    ],
+    "grammar": [
+      "adj. + enough + to do 足够……可以做（表结果/程度）",
+      "not...enough to do 不够……而不能做",
+      "直接引语后用 he thought 等 reporting clause",
+      "try again 再试一次"
+    ],
+    "words": [
+      {
+        "w": "strong",
+        "pos": "adj.",
+        "m": "强壮的；有力的"
+      },
+      {
+        "w": "enough",
+        "pos": "adv.",
+        "m": "足够地（置于形容词后）"
+      },
+      {
+        "w": "to try again",
+        "pos": "结构",
+        "m": "再试一次（enough to 结构）"
+      },
+      {
+        "w": "thought",
+        "pos": "v.",
+        "m": "想；认为（think 过去式）"
+      },
+      {
+        "w": "try",
+        "pos": "v.",
+        "m": "尝试"
+      }
+    ],
+    "components": [
+      {
+        "role": "引语内主语",
+        "text": "I",
+        "note": "直接引语内主语。“我”。"
+      },
+      {
+        "role": "引语内谓语",
+        "text": "am not",
+        "note": "系动词否定，“不是”。"
+      },
+      {
+        "role": "引语内表语",
+        "text": "strong",
+        "note": "表语，“强壮的”。"
+      },
+      {
+        "role": "引语内状语",
+        "text": "enough to try again",
+        "note": "enough 后置 + 结果不定式，“足够……可以再试一次”（否定即“不够强壮无法再试”）。"
+      },
+      {
+        "role": "报道分句",
+        "text": "he thought",
+        "note": "直接引语后的言语报道分句；he 主语 + thought 谓语。“他想”。"
+      }
+    ]
+  },
+  {
+    "id": "8B-06",
+    "book": "8下",
+    "page": 64,
+    "sentence": "Day and night, they raced against time to save as many people as possible.",
+    "translation": "他们日夜不停地争分夺秒，以拯救尽可能多的人。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "Day and night",
+        "note": "时间状语。"
+      },
+      {
+        "type": "主句",
+        "text": "they raced against time to save as many people as possible",
+        "note": "主语 they + 谓语 raced against time + 目的状语 to save as many people as possible。"
+      },
+      {
+        "type": "目的状语内含",
+        "text": "as many people as possible",
+        "note": "as...as possible 结构。"
+      }
+    ],
+    "grammar": [
+      "day and night 日夜；夜以继日",
+      "race against time 与时间赛跑/争分夺秒",
+      "to save... 不定式表目的",
+      "as many + 名词 + as possible 尽可能多的……"
+    ],
+    "words": [
+      {
+        "w": "day and night",
+        "pos": "phr.",
+        "m": "日夜；夜以继日"
+      },
+      {
+        "w": "race against time",
+        "pos": "phr.",
+        "m": "争分夺秒；与时间赛跑"
+      },
+      {
+        "w": "save",
+        "pos": "v.",
+        "m": "拯救；挽救"
+      },
+      {
+        "w": "as many as possible",
+        "pos": "结构",
+        "m": "尽可能多的"
+      },
+      {
+        "w": "people",
+        "pos": "n.",
+        "m": "人（复数）"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "Day and night",
+        "note": "时间状语，“日夜 / 夜以继日”。"
+      },
+      {
+        "role": "主语",
+        "text": "they",
+        "note": "句子主语。“他们”。"
+      },
+      {
+        "role": "谓语",
+        "text": "raced against time",
+        "note": "谓语短语，“与时间赛跑 / 争分夺秒”。"
+      },
+      {
+        "role": "目的状语",
+        "text": "to save as many people as possible",
+        "note": "不定式作目的状语；as many people as possible 作 save 的宾语。“以拯救尽可能多的人”。"
+      }
+    ]
+  },
+  {
+    "id": "8B-07",
+    "book": "8下",
+    "page": 65,
+    "sentence": "Even today, I still feel lucky to have had such an amazing experience in life.",
+    "translation": "即使在今天，我仍然觉得幸运，曾有过如此美妙的人生经历。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "Even today",
+        "note": "时间/强调状语。"
+      },
+      {
+        "type": "主句",
+        "text": "I still feel lucky to have had such an amazing experience in life",
+        "note": "主语 I + 状语 still + 系动词 feel + 表语 lucky + 状语 to have had...（不定式完成式）。"
+      }
+    ],
+    "grammar": [
+      "feel + adj. + to do 觉得……（lucky to have had 不定式完成式表“曾有过”）",
+      "even 甚至；即使",
+      "such + adj. + n. 如此……的……",
+      "in life 在生活中/人生中"
+    ],
+    "words": [
+      {
+        "w": "even",
+        "pos": "adv.",
+        "m": "甚至；即使"
+      },
+      {
+        "w": "still",
+        "pos": "adv.",
+        "m": "仍然"
+      },
+      {
+        "w": "feel lucky",
+        "pos": "phr.",
+        "m": "感到幸运"
+      },
+      {
+        "w": "amazing",
+        "pos": "adj.",
+        "m": "令人惊叹的；美妙的"
+      },
+      {
+        "w": "experience",
+        "pos": "n.",
+        "m": "经历"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "Even today",
+        "note": "时间/强调状语，“即使在今天”。"
+      },
+      {
+        "role": "主语",
+        "text": "I",
+        "note": "句子主语。"
+      },
+      {
+        "role": "状语",
+        "text": "still",
+        "note": "状语，“仍然”。"
+      },
+      {
+        "role": "谓语",
+        "text": "feel",
+        "note": "系动词，“感到”。"
+      },
+      {
+        "role": "表语",
+        "text": "lucky",
+        "note": "表语，“幸运的”。"
+      },
+      {
+        "role": "状语(不定式完成)",
+        "text": "to have had such an amazing experience in life",
+        "note": "不定式完成式作状语，表“曾有过”；such an amazing experience 作 have had 的宾语，amazing 为定语，in life 为状语。“曾有过如此美妙的人生经历”。"
+      }
+    ]
+  },
+  {
+    "id": "8B-08",
+    "book": "8下",
+    "page": 72,
+    "sentence": "For hundreds of years, people believed that dinosaurs looked like huge lizards.",
+    "translation": "数百年来，人们一直相信恐龙看起来像巨大的蜥蜴。",
+    "analysis": [
+      {
+        "type": "状语",
+        "text": "For hundreds of years",
+        "note": "for + 时间段，表示动作持续的长度。"
+      },
+      {
+        "type": "主句",
+        "text": "people believed that dinosaurs looked like huge lizards",
+        "note": "主语 people + 谓语 believed + that 宾语从句。"
+      },
+      {
+        "type": "宾语从句",
+        "text": "that dinosaurs looked like huge lizards",
+        "note": "that 引导宾语从句；looked like 系表结构。"
+      }
+    ],
+    "grammar": [
+      "for + 时间段 表示动作持续的长度",
+      "that 引导宾语从句（作 believed 的宾语）",
+      "look like 看起来像",
+      "huge lizards 巨大的蜥蜴"
+    ],
+    "words": [
+      {
+        "w": "for hundreds of years",
+        "pos": "phr.",
+        "m": "数百年来"
+      },
+      {
+        "w": "believe",
+        "pos": "v.",
+        "m": "相信；认为"
+      },
+      {
+        "w": "dinosaur",
+        "pos": "n.",
+        "m": "恐龙"
+      },
+      {
+        "w": "look like",
+        "pos": "phr.",
+        "m": "看起来像"
+      },
+      {
+        "w": "huge",
+        "pos": "adj.",
+        "m": "巨大的"
+      },
+      {
+        "w": "lizard",
+        "pos": "n.",
+        "m": "蜥蜴"
+      }
+    ],
+    "components": [
+      {
+        "role": "状语",
+        "text": "For hundreds of years",
+        "note": "for + 时间段表动作持续长度，“数百年来”。"
+      },
+      {
+        "role": "主语",
+        "text": "people",
+        "note": "句子主语。“人们”。"
+      },
+      {
+        "role": "谓语",
+        "text": "believed",
+        "note": "及物动词谓语，“相信”。"
+      },
+      {
+        "role": "宾语(从句)",
+        "text": "that dinosaurs looked like huge lizards",
+        "note": "that 引导宾语从句，作 believed 的宾语；dinosaurs + 系表 looked like huge lizards。“恐龙看起来像巨大的蜥蜴”。"
+      }
+    ]
+  },
+  {
+    "id": "8B-09",
+    "book": "8下",
+    "page": 80,
+    "sentence": "To carry out his research, he spent years in wild mountains and forests.",
+    "translation": "为了开展他的研究，他多年待在荒野的山林里。",
+    "analysis": [
+      {
+        "type": "目的状语",
+        "text": "To carry out his research",
+        "note": "不定式短语作目的状语（= in order to）。"
+      },
+      {
+        "type": "主句",
+        "text": "he spent years in wild mountains and forests",
+        "note": "主语 he + 谓语 spent + 宾语 years + 状语 in wild mountains and forests。"
+      }
+    ],
+    "grammar": [
+      "不定式 to do 置于句首表目的（= in order to）",
+      "carry out 开展；执行",
+      "spend + 时间 + in (doing) 在……度过（时间）",
+      "wild mountains and forests 荒野山林"
+    ],
+    "words": [
+      {
+        "w": "to carry out",
+        "pos": "phr.",
+        "m": "为了开展；执行"
+      },
+      {
+        "w": "research",
+        "pos": "n.",
+        "m": "研究"
+      },
+      {
+        "w": "spend",
+        "pos": "v.",
+        "m": "度过；花费（spent 过去式）"
+      },
+      {
+        "w": "wild",
+        "pos": "adj.",
+        "m": "野生的；荒野的"
+      },
+      {
+        "w": "forest",
+        "pos": "n.",
+        "m": "森林"
+      }
+    ],
+    "components": [
+      {
+        "role": "目的状语",
+        "text": "To carry out his research",
+        "note": "不定式置于句首表目的（= in order to），“为了开展他的研究”。"
+      },
+      {
+        "role": "主语",
+        "text": "he",
+        "note": "句子主语。"
+      },
+      {
+        "role": "谓语",
+        "text": "spent",
+        "note": "及物动词谓语，“度过 / 花费”。"
+      },
+      {
+        "role": "宾语",
+        "text": "years",
+        "note": "spent 的宾语（时间）。“多年”。"
+      },
+      {
+        "role": "状语",
+        "text": "in wild mountains and forests",
+        "note": "地点状语，“在荒野山林里”。"
+      }
+    ]
+  },
+  {
+    "id": "8B-10",
+    "book": "8下",
+    "page": 81,
+    "sentence": "Although he received the First Class Award of the National Natural Science Award twice, he hardly mentioned it.",
+    "translation": "尽管他两次获得国家自然科学一等奖，他却几乎从不提及。",
+    "analysis": [
+      {
+        "type": "让步状语从句",
+        "text": "Although he received the First Class Award of the National Natural Science Award twice",
+        "note": "although 引导让步状语从句。"
+      },
+      {
+        "type": "主句",
+        "text": "he hardly mentioned it",
+        "note": "主语 he + 状语 hardly + 谓语 mentioned + 宾语 it。"
+      }
+    ],
+    "grammar": [
+      "although 引导让步状语从句",
+      "receive an award 获得奖项",
+      "hardly 几乎不（否定副词，表频度低）",
+      "mention 提及"
+    ],
+    "words": [
+      {
+        "w": "although",
+        "pos": "conj.",
+        "m": "虽然；尽管"
+      },
+      {
+        "w": "receive",
+        "pos": "v.",
+        "m": "获得；收到"
+      },
+      {
+        "w": "award",
+        "pos": "n.",
+        "m": "奖；奖项"
+      },
+      {
+        "w": "twice",
+        "pos": "adv.",
+        "m": "两次"
+      },
+      {
+        "w": "hardly",
+        "pos": "adv.",
+        "m": "几乎不"
+      }
+    ],
+    "components": [
+      {
+        "role": "让步状语从句",
+        "text": "Although he received the First Class Award of the National Natural Science Award twice",
+        "note": "although 引导让步状语从句；he + 谓语 received + 宾语 the First Class Award... + 状语 twice。“尽管他两次获国家自然科学一等奖”。"
+      },
+      {
+        "role": "主语",
+        "text": "he",
+        "note": "主句主语。"
+      },
+      {
+        "role": "状语",
+        "text": "hardly",
+        "note": "否定频度副词，“几乎不”。"
+      },
+      {
+        "role": "谓语",
+        "text": "mentioned",
+        "note": "及物动词谓语，“提及”。"
+      },
+      {
+        "role": "宾语",
+        "text": "it",
+        "note": "mentioned 的宾语，指代奖项。“它”。"
+      }
+    ]
+  },
+  {
+    "id": "8B-11",
+    "book": "8下",
+    "page": 89,
+    "sentence": "The terms helped them understand why things happened at certain times, and how they should react.",
+    "translation": "这些节气帮助他们理解事物为何在特定的时间发生，以及他们该如何应对。",
+    "analysis": [
+      {
+        "type": "主句",
+        "text": "The terms helped them understand why... and how...",
+        "note": "主语 The terms + 谓语 helped + 宾语 them + 宾补 (to) understand + 双宾语从句。"
+      },
+      {
+        "type": "宾语从句1",
+        "text": "why things happened at certain times",
+        "note": "why 引导宾语从句。"
+      },
+      {
+        "type": "宾语从句2",
+        "text": "how they should react",
+        "note": "how 引导宾语从句，与 why 从句由 and 并列。"
+      }
+    ],
+    "grammar": [
+      "help sb. (to) do sth. 帮助某人做某事",
+      "why / how 引导宾语从句（作 understand 的宾语），由 and 并列",
+      "at certain times 在特定的时间",
+      "react 反应；应对"
+    ],
+    "words": [
+      {
+        "w": "term",
+        "pos": "n.",
+        "m": "术语；此处指“节气”（the 24 Solar Terms 二十四节气）"
+      },
+      {
+        "w": "help",
+        "pos": "v.",
+        "m": "帮助（help sb. do）"
+      },
+      {
+        "w": "understand",
+        "pos": "v.",
+        "m": "理解"
+      },
+      {
+        "w": "why",
+        "pos": "adv.",
+        "m": "为什么（引导宾从）"
+      },
+      {
+        "w": "certain",
+        "pos": "adj.",
+        "m": "特定的；某些"
+      },
+      {
+        "w": "react",
+        "pos": "v.",
+        "m": "反应；应对"
+      }
+    ],
+    "components": [
+      {
+        "role": "主语",
+        "text": "The terms",
+        "note": "句子主语，指“节气”。“这些术语/节气”。"
+      },
+      {
+        "role": "谓语",
+        "text": "helped",
+        "note": "及物动词谓语，“帮助”。"
+      },
+      {
+        "role": "宾语",
+        "text": "them",
+        "note": "helped 的宾语。“他们”。"
+      },
+      {
+        "role": "宾补(不定式)",
+        "text": "(to) understand why... and how...",
+        "note": "help sb (to) do 的不定式宾补。“理解……”。"
+      },
+      {
+        "role": "宾语从句①",
+        "text": "why things happened at certain times",
+        "note": "why 引导宾语从句，作 understand 的宾语。“事物为何在特定时间发生”。"
+      },
+      {
+        "role": "宾语从句②",
+        "text": "how they should react",
+        "note": "how 引导宾语从句，与 why 从句由 and 并列。“他们该如何应对”。"
+      }
+    ]
+  },
+  {
+    "id": "8B-12",
+    "book": "8下",
+    "page": 97,
+    "sentence": "Although modern technology is solving some problems, the karez system still plays an important role.",
+    "translation": "尽管现代技术正在解决一些问题，但坎儿井系统仍然发挥着重要作用。",
+    "analysis": [
+      {
+        "type": "让步状语从句",
+        "text": "Although modern technology is solving some problems",
+        "note": "although 引导让步状语从句（现在进行时）。"
+      },
+      {
+        "type": "主句",
+        "text": "the karez system still plays an important role",
+        "note": "主语 the karez system + 状语 still + 谓语 plays + 宾语 an important role。"
+      }
+    ],
+    "grammar": [
+      "although 引导让步状语从句",
+      "现在进行时 is solving 表示正在进行的动作",
+      "play an important role 发挥重要作用",
+      "karez system 坎儿井系统（新疆引水工程）"
+    ],
+    "words": [
+      {
+        "w": "although",
+        "pos": "conj.",
+        "m": "虽然"
+      },
+      {
+        "w": "modern",
+        "pos": "adj.",
+        "m": "现代的"
+      },
+      {
+        "w": "technology",
+        "pos": "n.",
+        "m": "技术"
+      },
+      {
+        "w": "solve",
+        "pos": "v.",
+        "m": "解决"
+      },
+      {
+        "w": "play an important role",
+        "pos": "phr.",
+        "m": "发挥重要作用"
+      }
+    ],
+    "components": [
+      {
+        "role": "让步状语从句",
+        "text": "Although modern technology is solving some problems",
+        "note": "although 引导让步状语从句（现在进行时）；modern technology + 谓语 is solving + 宾语 some problems。“尽管现代技术正在解决一些问题”。"
+      },
+      {
+        "role": "主语",
+        "text": "the karez system",
+        "note": "主句主语，“坎儿井系统”。"
+      },
+      {
+        "role": "状语",
+        "text": "still",
+        "note": "状语，“仍然”。"
+      },
+      {
+        "role": "谓语",
+        "text": "plays",
+        "note": "及物动词谓语，“发挥”。"
+      },
+      {
+        "role": "宾语",
+        "text": "an important role",
+        "note": "play 的宾语，“重要作用”。"
+      }
+    ]
+  }
+];
