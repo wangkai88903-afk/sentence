@@ -1,0 +1,18 @@
+# Render.com 部署配置（免费 Web Service）
+# 部署方式：在 Render 控制台 "New" -> "Web Service" -> 连接 Git 仓库并选择此目录；
+# 或直接用 Render Blueprint 导入本文件。
+services:
+  - type: web
+    name: lcs-checkin-sync
+    runtime: node
+    plan: free
+    region: oregon          # 可改为 singapore 更接近国内（但免费版仅部分区域）
+    branch: main            # 如使用 Git 仓库部署请改成你的默认分支
+    buildCommand: "npm install"
+    startCommand: "node server.js"
+    healthCheckPath: "/api/ping"
+    envVars:
+      - key: PORT
+        value: "10000"      # Render 注入实际端口；本地运行时忽略
+      - key: NODE_ENV
+        value: "production"
