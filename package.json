@@ -1,0 +1,13 @@
+{
+  "name": "lcs-checkin-sync",
+  "version": "1.0.0",
+  "description": "初中英语长难句打卡 · 云同步后端（同时托管 PWA 静态文件）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {}
+}
