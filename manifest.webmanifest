@@ -1,0 +1,14 @@
+{
+  "name": "初中英语长难句打卡",
+  "short_name": "长难句打卡",
+  "description": "天津中考英语长难句每日打卡（家长/孩子）",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6fb",
+  "theme_color": "#2f6fed",
+  "icons": [
+    { "src": "./icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
