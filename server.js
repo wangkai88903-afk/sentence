@@ -54,15 +54,13 @@ function mergeInto(server, client) {
   }
   if (client.accounts && typeof client.accounts === 'object') {
     server.accounts = server.accounts || {};
-    ['parent', 'child'].forEach(function (role) {
-      var ca = client.accounts[role];
+    Object.keys(client.accounts).forEach(function (k) {
+      var ca = client.accounts[k];
       if (ca && ca.user && ca.pass) {
-        var sa = server.accounts[role];
-        if (!sa || !sa.user || !sa.pass) server.accounts[role] = ca; // 优先补全缺失
-        else if (ca.user !== sa.user) server.accounts[role] = ca;     // 用户名不同则以后者为准（收敛）
+        var sa = server.accounts[k];
+        if (!sa || sa.pass !== ca.pass || sa.role !== ca.role) server.accounts[k] = ca;
       }
     });
-    if (!server.accounts.parent && !server.accounts.child) server.accounts = client.accounts;
   }
   server.updatedAt = Date.now();
 }
