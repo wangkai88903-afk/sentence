@@ -105,7 +105,16 @@ const server = http.createServer(function (req, res) {
 
       if (u === '/api/sync/pull' || u === '/api/sync/push') {
         var fam = DB[body.familyId];
-        if (!fam || fam.keyHash !== keyHash(body.familyKey)) {
+        if (!fam) {
+          // Render 重启导致内存清空：用用户持有的口令“自愈”重建该家庭，
+          // 这样任意一端打开 App 都会把本地打卡记录重新推回云端，数据不会丢。
+          if (body.familyKey) {
+            fam = DB[body.familyId] = { keyHash: keyHash(body.familyKey), accounts: null, checkins: {}, extra: [], updatedAt: Date.now() };
+          } else {
+            return sendJSON(res, 401, { ok: false, msg: '家庭不存在，请确认口令或重新创建家庭云' });
+          }
+        }
+        if (fam.keyHash !== keyHash(body.familyKey)) {
           return sendJSON(res, 401, { ok: false, msg: '家庭口令不正确' });
         }
         if (u === '/api/sync/push') {
