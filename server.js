@@ -48,6 +48,7 @@ function betterRec(a, b) {
   var ta = a.ts || 0, tb = b.ts || 0;
   if (ta !== tb) return ta > tb ? a : b;
   if (!!a.correctedPhoto !== !!b.correctedPhoto) return a.correctedPhoto ? a : b;
+  if (!!a.deleted !== !!b.deleted) return a.deleted ? a : b;
   return a;
 }
 
