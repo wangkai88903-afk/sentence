@@ -164,6 +164,10 @@
           <div id="postCheck" class="hidden">
             <div class="muted" id="checkedNote"></div>
             <img id="checkedPhoto" class="photo hidden" alt="打卡照片" />
+            <div id="correctedBox" class="hidden" style="margin-top:8px">
+              <div class="muted">📝 订正后照片</div>
+              <img id="correctedPhoto" class="photo" alt="订正照片" style="cursor:zoom-in" />
+            </div>
             <div class="row" style="margin-top:8px">
               <button class="btn sm amber" id="recheckBtn">✏️ 订正</button>
             </div>
@@ -4283,6 +4287,11 @@ window.SENTENCES = [
         $("checkedNote").textContent = "✅ 已于 " + ck.date + " 打卡" + (ck.corrected? " · 已订正" : "") + (ck.file?("（"+ck.file+"）"):"");
         if(ck.photo){ $("checkedPhoto").src=ck.photo; $("checkedPhoto").classList.remove("hidden"); $("checkedPhoto").style.cursor="zoom-in"; $("checkedPhoto").onclick=function(){ openImg(ck.photo); }; }
         else { $("checkedPhoto").classList.add("hidden"); $("checkedPhoto").onclick=null; }
+        if(ck.correctedPhoto){
+          $("correctedBox").classList.remove("hidden");
+          $("correctedPhoto").src=ck.correctedPhoto;
+          $("correctedPhoto").onclick=function(){ openImg(ck.correctedPhoto); };
+        } else { $("correctedBox").classList.add("hidden"); $("correctedPhoto").onclick=null; }
         fillAnalysis(s);
         $("analysis").classList.add("show");
       } else {
@@ -4318,7 +4327,13 @@ window.SENTENCES = [
       var s=S[childIdx];
       if(correcting){
         var old = checkins[s.id] || {};
-        checkins[s.id] = { date: old.date || todayStr(), photo: curPhoto, file: curFile, ts: Date.now(), corrected: true, firstTs: old.firstTs || old.ts || Date.now() };
+        checkins[s.id] = {
+          date: old.date || todayStr(),
+          photo: old.photo, file: old.file, ts: old.ts || Date.now(),
+          firstTs: old.firstTs || old.ts || Date.now(),
+          corrected: true,
+          correctedPhoto: curPhoto, correctedFile: curFile, correctedTs: Date.now()
+        };
         correcting = false;
       } else {
         checkins[s.id] = { date: todayStr(), photo: curPhoto, file: curFile, ts: Date.now(), firstTs: Date.now() };
@@ -4383,9 +4398,12 @@ window.SENTENCES = [
           + '<span class="muted">'+ck.date+(ck.file?(" · "+esc(ck.file)):"")+'</span></div>'
           + '<div class="sentence" style="font-size:16px">'+esc(s.sentence)+'</div>'
           + (ck.photo? '<img class="photo" src="'+ck.photo+'" style="max-width:200px;cursor:zoom-in" alt="照片"/>' : '<div class="muted">（无照片）</div>')
+          + (ck.correctedPhoto? '<div class="muted" style="margin-top:4px">📝 订正后照片</div><img class="photo" src="'+ck.correctedPhoto+'" style="max-width:200px;cursor:zoom-in" alt="订正照片" data-corrected="1"/>' : '')
           + '<button class="btn sm ghost" style="margin-top:8px">查看详细解析</button>';
         var ph=div.querySelector("img");
         if(ph) ph.onclick=function(){ openImg(ck.photo); };
+        var phc=div.querySelector("img[data-corrected]");
+        if(phc) phc.onclick=function(){ openImg(ck.correctedPhoto); };
         div.querySelector("button").onclick = function(){ openDetail(s, ck); };
         list.appendChild(div);
       });
@@ -4505,10 +4523,13 @@ window.SENTENCES = [
       body.innerHTML='<div class="row between"><span class="daybadge">'+dayNo(i)+'</span><span class="muted">'+ck.date+(ck.file?(" · "+esc(ck.file)):"")+'</span></div>'
         + '<div class="sentence" style="font-size:17px">'+esc(s.sentence)+'</div>'
         + (ck.photo?'<img class="photo" src="'+ck.photo+'" style="max-width:240px;cursor:zoom-in" alt="照片" id="detailPhoto"/>':'')
+        + (ck.correctedPhoto?'<div class="muted" style="margin-top:6px">📝 订正后照片</div><img class="photo" src="'+ck.correctedPhoto+'" style="max-width:240px;cursor:zoom-in" alt="订正照片" id="detailCorrected"/>':'')
         + analysisHTML(s);
       $("mask").classList.remove("hidden");
       var dp=document.getElementById("detailPhoto");
       if(dp) dp.onclick=function(){ openImg(ck.photo); };
+      var dc=document.getElementById("detailCorrected");
+      if(dc) dc.onclick=function(){ openImg(ck.correctedPhoto); };
     }
     function analysisHTML(s){
       var h='<div class="sec"><h3><span class="bar"></span>参考译文</h3><div>'+esc(s.translation)+'</div></div>'
