@@ -4097,6 +4097,14 @@ window.SENTENCES = [
     function mergeFromCloud(payload){
       if(!payload) return 0;
       var changed = 0;
+      // 选出更完整/更新的打卡记录（与 server 端一致）：ts 大者优先；ts 相等保留带订正照片者
+      function betterRec(a, b){
+        if(!a) return b || null; if(!b) return a;
+        var ta=a.ts||0, tb=b.ts||0;
+        if(ta!==tb) return ta>tb?a:b;
+        if(!!a.correctedPhoto !== !!b.correctedPhoto) return a.correctedPhoto?a:b;
+        return a;
+      }
       if(Array.isArray(payload.extra) && payload.extra.length){
         var ex = LS.get("lcs_extra", []) || [];
         var seen = {}; ex.forEach(function(x){ if(x&&x.id) seen[x.id]=1; }); S.forEach(function(x){ if(x&&x.id) seen[x.id]=1; });
@@ -4128,7 +4136,8 @@ window.SENTENCES = [
       var pc = payload.checkins || {};
       Object.keys(pc).forEach(function(k){
         var c = pc[k], s = ck[k];
-        if(!s || (c && c.ts && (!s.ts || c.ts >= s.ts))){ ck[k] = c; changed++; }
+        var win = betterRec(c, s);
+        if(win !== s){ ck[k] = win; changed++; }
       });
       if(changed){ LS.set("lcs_checkins", ck); checkins = ck; }
       return changed;
@@ -4329,7 +4338,7 @@ window.SENTENCES = [
         var old = checkins[s.id] || {};
         checkins[s.id] = {
           date: old.date || todayStr(),
-          photo: old.photo, file: old.file, ts: old.ts || Date.now(),
+          photo: old.photo, file: old.file, ts: Date.now(),
           firstTs: old.firstTs || old.ts || Date.now(),
           corrected: true,
           correctedPhoto: curPhoto, correctedFile: curFile, correctedTs: Date.now()
