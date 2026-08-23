@@ -38,7 +38,15 @@ function genCode(len) {
 function keyHash(k) { return crypto.createHash('sha256').update('lcs|' + k).digest('hex'); }
 
 // 合并：checkins 按 ts 后写覆盖；extra 按 id 去重并集；accounts 按角色合并
+// client.remove 为要移除的成员用户名数组（家长删除成员时使用）
 function mergeInto(server, client) {
+  server.removed = server.removed || [];
+  if (Array.isArray(client.remove) && client.remove.length) {
+    client.remove.forEach(function (u) {
+      if (server.accounts && server.accounts[u]) delete server.accounts[u];
+      if (server.removed.indexOf(u) < 0) server.removed.push(u);
+    });
+  }
   if (client.checkins && typeof client.checkins === 'object') {
     server.checkins = server.checkins || {};
     Object.keys(client.checkins).forEach(function (k) {
@@ -55,6 +63,7 @@ function mergeInto(server, client) {
   if (client.accounts && typeof client.accounts === 'object') {
     server.accounts = server.accounts || {};
     Object.keys(client.accounts).forEach(function (k) {
+      if (server.removed.indexOf(k) >= 0) return; // 已被移除的成员不再合并回来
       var ca = client.accounts[k];
       if (ca && ca.user && ca.pass) {
         var sa = server.accounts[k];
@@ -99,7 +108,7 @@ const server = http.createServer(function (req, res) {
 
       if (u === '/api/family/create') {
         var fid = genCode(6), fk = genCode(8);
-        DB[fid] = { keyHash: keyHash(fk), accounts: null, checkins: {}, extra: [], updatedAt: Date.now() };
+        DB[fid] = { keyHash: keyHash(fk), accounts: null, checkins: {}, extra: [], removed: [], updatedAt: Date.now() };
         return sendJSON(res, 200, { ok: true, familyId: fid, familyKey: fk, code: fid + '-' + fk });
       }
 
@@ -109,7 +118,7 @@ const server = http.createServer(function (req, res) {
           // Render 重启导致内存清空：用用户持有的口令“自愈”重建该家庭，
           // 这样任意一端打开 App 都会把本地打卡记录重新推回云端，数据不会丢。
           if (body.familyKey) {
-            fam = DB[body.familyId] = { keyHash: keyHash(body.familyKey), accounts: null, checkins: {}, extra: [], updatedAt: Date.now() };
+            fam = DB[body.familyId] = { keyHash: keyHash(body.familyKey), accounts: null, checkins: {}, extra: [], removed: [], updatedAt: Date.now() };
           } else {
             return sendJSON(res, 401, { ok: false, msg: '家庭不存在，请确认口令或重新创建家庭云' });
           }
@@ -122,7 +131,8 @@ const server = http.createServer(function (req, res) {
         }
         return sendJSON(res, 200, {
           ok: true, updatedAt: fam.updatedAt,
-          accounts: fam.accounts, checkins: fam.checkins || {}, extra: fam.extra || []
+          accounts: fam.accounts, checkins: fam.checkins || {}, extra: fam.extra || [],
+          removed: fam.removed || []
         });
       }
 
