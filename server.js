@@ -39,6 +39,18 @@ function keyHash(k) { return crypto.createHash('sha256').update('lcs|' + k).dige
 
 // 合并：checkins 按 ts 后写覆盖；extra 按 id 去重并集；accounts 按角色合并
 // client.remove 为要移除的成员用户名数组（家长删除成员时使用）
+
+// 选出「更完整/更新」的一条打卡记录：ts 大者优先；ts 相等时优先保留带订正照片的记录，
+// 避免多设备并行时订正照片被旧记录覆盖。
+function betterRec(a, b) {
+  if (!a) return b || null;
+  if (!b) return a;
+  var ta = a.ts || 0, tb = b.ts || 0;
+  if (ta !== tb) return ta > tb ? a : b;
+  if (!!a.correctedPhoto !== !!b.correctedPhoto) return a.correctedPhoto ? a : b;
+  return a;
+}
+
 function mergeInto(server, client) {
   server.removed = server.removed || [];
   if (Array.isArray(client.remove) && client.remove.length) {
@@ -52,7 +64,7 @@ function mergeInto(server, client) {
     Object.keys(client.checkins).forEach(function (k) {
       var c = client.checkins[k];
       var s = server.checkins[k];
-      if (!s || (c && c.ts && (!s.ts || c.ts >= s.ts))) server.checkins[k] = c;
+      server.checkins[k] = betterRec(c, s);
     });
   }
   if (Array.isArray(client.extra) && client.extra.length) {
