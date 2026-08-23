@@ -4103,6 +4103,7 @@ window.SENTENCES = [
         var ta=a.ts||0, tb=b.ts||0;
         if(ta!==tb) return ta>tb?a:b;
         if(!!a.correctedPhoto !== !!b.correctedPhoto) return a.correctedPhoto?a:b;
+        if(!!a.deleted !== !!b.deleted) return a.deleted?a:b;
         return a;
       }
       if(Array.isArray(payload.extra) && payload.extra.length){
@@ -4272,7 +4273,7 @@ window.SENTENCES = [
     var curPhoto = null, curFile = null, correcting = false;
 
     function firstUnchecked(){
-      for(var i=0;i<S.length;i++){ if(!checkins[S[i].id]) return i; }
+      for(var i=0;i<S.length;i++){ var c=checkins[S[i].id]; if(!c || c.deleted) return i; }
       return S.length-1;
     }
 
@@ -4288,7 +4289,7 @@ window.SENTENCES = [
       $("confirmBtn").disabled = true;
 
       var ck = checkins[s.id];
-      if(ck){
+      if(ck && !ck.deleted){
         correcting = false;
         $("cancelCorrect").classList.add("hidden");
         $("preCheck").classList.add("hidden");
@@ -4376,7 +4377,7 @@ window.SENTENCES = [
     function renderParent(){
       // 未加入家庭云时给出显眼引导
       if($("pCloudHint")) $("pCloudHint").classList.toggle("hidden", syncAvail());
-      var ids = Object.keys(checkins);
+      var ids = Object.keys(checkins).filter(function(k){ return !(checkins[k] && checkins[k].deleted); });
       $("pTotal").textContent = ids.length;
       // 连续天数
       var dates = ids.map(function(k){return checkins[k].date;}).sort();
@@ -4398,8 +4399,8 @@ window.SENTENCES = [
 
       // 记录列表
       var list = $("pRecList"); list.innerHTML="";
-      var done = S.filter(function(s){ return checkins[s.id]; });
-      $("pRecNote").textContent = done.length? ("共 "+done.length+" 条打卡记录，点击可看照片与详细解析") : "孩子还没有打卡记录。";
+      var done = S.filter(function(s){ return checkins[s.id] && !checkins[s.id].deleted; });
+      $("pRecNote").textContent = done.length? ("共 "+done.length+" 条打卡记录，点击可看照片与详细解析；家长可删除记录") : "孩子还没有打卡记录。";
       done.forEach(function(s){
         var ck=checkins[s.id], i=S.indexOf(s);
         var div=document.createElement("div"); div.className="rec";
@@ -4408,14 +4409,26 @@ window.SENTENCES = [
           + '<div class="sentence" style="font-size:16px">'+esc(s.sentence)+'</div>'
           + (ck.photo? '<img class="photo" src="'+ck.photo+'" style="max-width:200px;cursor:zoom-in" alt="照片"/>' : '<div class="muted">（无照片）</div>')
           + (ck.correctedPhoto? '<div class="muted" style="margin-top:4px">📝 订正后照片</div><img class="photo" src="'+ck.correctedPhoto+'" style="max-width:200px;cursor:zoom-in" alt="订正照片" data-corrected="1"/>' : '')
-          + '<button class="btn sm ghost" style="margin-top:8px">查看详细解析</button>';
-        var ph=div.querySelector("img");
+          + '<div class="row" style="margin-top:8px"><button class="btn sm ghost det">查看详细解析</button><button class="btn sm ghost del">🗑 删除</button></div>';
+        var ph=div.querySelector("img:not([data-corrected])");
         if(ph) ph.onclick=function(){ openImg(ck.photo); };
         var phc=div.querySelector("img[data-corrected]");
         if(phc) phc.onclick=function(){ openImg(ck.correctedPhoto); };
-        div.querySelector("button").onclick = function(){ openDetail(s, ck); };
+        div.querySelector(".det").onclick = function(){ openDetail(s, ck); };
+        div.querySelector(".del").onclick = function(){ deleteCheckin(s.id); };
         list.appendChild(div);
       });
+    }
+
+    // 家长删除孩子的某条打卡记录（写墓碑，跨设备生效）
+    function deleteCheckin(id){
+      var ck = checkins[id];
+      if(!ck || ck.deleted) return;
+      if(!confirm("确定删除这条打卡记录吗？\n删除后家长端和孩子端都会移除，孩子可重新打卡。")) return;
+      checkins[id] = { ts: Date.now(), deleted: true };
+      LS.set("lcs_checkins", checkins);
+      if(session.role === "parent") renderParent(); else renderChild(childIdx);
+      syncPush();
     }
 
     // ========== 解析渲染 ==========
@@ -4459,7 +4472,8 @@ window.SENTENCES = [
     function dateMap(){
       var m={};
       Object.keys(checkins).forEach(function(k){
-        var d=checkins[k].date; (m[d]=m[d]||[]).push(k);
+        var c=checkins[k];
+        if(c && !c.deleted && c.date){ (m[c.date]=m[c.date]||[]).push(k); }
       });
       return m;
     }
