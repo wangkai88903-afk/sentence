@@ -4270,7 +4270,7 @@ window.SENTENCES = [
 
     // ========== 孩子视图 ==========
     var childIdx = 0;
-    var curPhoto = null, curFile = null, correcting = false;
+    var curPhoto = null, curFile = null, correcting = false, curSid = null;
 
     function firstUnchecked(){
       for(var i=0;i<S.length;i++){ var c=checkins[S[i].id]; if(!c || c.deleted) return i; }
@@ -4285,10 +4285,19 @@ window.SENTENCES = [
       $("sentenceText").textContent = s.sentence;
       $("bookNo").textContent = "教材：" + s.book;
 
-      curPhoto=null; curFile=null; $("photoInput").value=""; $("photoPreview").innerHTML="";
-      $("confirmBtn").disabled = true;
-
       var ck = checkins[s.id];
+      var checked = ck && !ck.deleted;
+      var sameSid = (s.id === curSid);
+      // 仅当“切换到另一句”或“该句已打卡”时才清空待上传照片；
+      // 同一句且处于待打卡（含被家长删除后待重打）状态时，保留正在选择的照片，
+      // 避免 startSync 轮询触发 renderChild 把刚选好的照片清空，导致“无法拍照打卡”。
+      if(!sameSid || checked){
+        curPhoto=null; curFile=null; $("photoInput").value=""; $("photoPreview").innerHTML="";
+        $("confirmBtn").disabled = true;
+        correcting = false;
+        $("cancelCorrect").classList.add("hidden");
+      }
+      curSid = s.id;
       if(ck && !ck.deleted){
         correcting = false;
         $("cancelCorrect").classList.add("hidden");
