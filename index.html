@@ -67,6 +67,10 @@
   .tabs button{flex:1;border:none;background:transparent;padding:10px;border-radius:9px;font-size:14px;font-weight:700;color:var(--sub);cursor:pointer}
   .tabs button.on{background:#fff;color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,.08)}
   .err{color:var(--red);font-size:13px;min-height:18px;margin-top:6px}
+  .auth-link{text-align:center;font-size:14px;color:var(--sub);margin-top:10px}
+  .auth-link span{color:var(--blue);font-weight:700;cursor:pointer}
+  .navgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+  .navgrid .btn{width:100%;box-sizing:border-box;text-align:center}
   /* calendar */
   .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
   .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
@@ -90,17 +94,21 @@
 </style>
 </head>
 <body>
-  <!-- 创建家庭账号 -->
-  <div id="setup" class="auth hidden">
-    <div class="logo"><div class="e">📘</div><h2>创建家庭账号</h2><div class="muted">先设置一位家长（主账号）和一个孩子（子账号）</div></div>
+  <!-- 注册账号 -->
+  <div id="register" class="auth hidden">
+    <div class="logo"><div class="e">📘</div><h2>注册账号</h2><div class="muted">创建你的打卡账号，并选择角色</div></div>
     <div class="card" style="box-shadow:none">
-      <div class="field"><label>家长用户名</label><input id="suParent" placeholder="例如：爸爸" /></div>
-      <div class="field"><label>家长密码</label><input id="spParent" type="password" placeholder="设置家长密码" /></div>
-      <div class="field"><label>孩子用户名</label><input id="suChild" placeholder="例如：小明" /></div>
-      <div class="field"><label>孩子密码</label><input id="spChild" type="password" placeholder="设置孩子密码" /></div>
-      <button class="btn block" id="setupBtn">创建并进入</button>
-      <div class="err" id="setupErr"></div>
-      <div class="muted" style="margin-top:8px">账号信息仅保存在本设备浏览器中（本地），不会上传到任何服务器。</div>
+      <div class="field"><label>用户名</label><input id="regUser" placeholder="例如：小明" /></div>
+      <div class="field"><label>密码</label><input id="regPass" type="password" placeholder="至少 4 位" /></div>
+      <div class="field"><label>确认密码</label><input id="regPass2" type="password" placeholder="再次输入密码" /></div>
+      <div class="tabs" id="regRoleTabs">
+        <button id="regRoleChild" class="on" data-role="child">孩子</button>
+        <button id="regRoleParent" data-role="parent">家长</button>
+      </div>
+      <button class="btn block" id="regBtn">注册并进入</button>
+      <div class="err" id="regErr"></div>
+      <div class="auth-link">已有账号？<span id="toLogin">去登录</span></div>
+      <div class="muted" style="margin-top:8px;text-align:center">账号信息先保存在本设备，加入家庭云后才与家庭成员共享。</div>
     </div>
   </div>
 
@@ -108,14 +116,11 @@
   <div id="login" class="auth hidden">
     <div class="logo"><div class="e">📘</div><h2>长难句打卡 · 登录</h2></div>
     <div class="card" style="box-shadow:none">
-      <div class="tabs">
-        <button id="tabChild" class="on" data-role="child">孩子</button>
-        <button id="tabParent" data-role="parent">家长</button>
-      </div>
       <div class="field"><label>用户名</label><input id="liUser" placeholder="用户名" /></div>
       <div class="field"><label>密码</label><input id="liPass" type="password" placeholder="密码" /></div>
       <button class="btn block" id="loginBtn">登录</button>
       <div class="err" id="loginErr"></div>
+      <div class="auth-link">还没有账号？<span id="toRegister">去注册</span></div>
     </div>
   </div>
 
@@ -127,7 +132,6 @@
         <div class="sub" id="roleSub"></div>
       </div>
       <span id="syncStat" style="display:none;align-self:center;font-size:12px;margin-right:8px"></span>
-      <button class="btn sm ghost" id="gearBtn" style="color:#fff;border-color:#fff;background:transparent;margin-right:6px">⚙</button>
       <button class="btn sm ghost" id="logoutBtn" style="color:#fff;border-color:#fff;background:transparent">退出</button>
     </div>
     <div class="wrap">
@@ -168,20 +172,25 @@
         </div>
 
         <div class="card">
-          <div class="row between">
+          <div class="navgrid">
             <button class="btn sm ghost" id="prevBtn">← 上一句</button>
             <button class="btn sm ghost" id="todayBtn">今日待打卡</button>
             <button class="btn sm ghost" id="nextBtn">下一句 →</button>
-          </div>
-          <div class="row" style="margin-top:10px">
             <button class="btn sm ghost" id="allBtn">全部句子</button>
             <button class="btn sm ghost" id="calBtn">📅 打卡日历</button>
+            <button class="btn sm ghost" id="setBtn">⚙ 设置</button>
           </div>
         </div>
       </div>
 
       <!-- 家长视图 -->
       <div id="parentView" class="hidden">
+        <div class="card" style="padding:14px 18px">
+          <div class="row between">
+            <h3 style="margin:0">家长控制台</h3>
+            <button class="btn sm ghost" id="pSetBtn">⚙ 设置</button>
+          </div>
+        </div>
         <div class="stats">
           <div class="stat"><div class="n" id="pTotal">0</div><div class="t">孩子已打卡 / 48</div></div>
           <div class="stat"><div class="n" id="pStreak">0</div><div class="t">连续打卡天数</div></div>
@@ -3879,6 +3888,17 @@ window.SENTENCES = [
       set:function(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ alert("本地存储空间不足，请清理浏览器数据或减少照片。"); } }
     };
     function hash(s){ var h=0; s=String(s); for(var i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))|0; } return "h"+(h>>>0); }
+    function normalizeAccounts(acc){
+      // 兼容旧版 {parent:{...}, child:{...}}，转换为以用户名为键的新格式
+      if(!acc) return null;
+      if(acc.parent || acc.child){
+        var map={};
+        if(acc.parent && acc.parent.user) map[acc.parent.user]={user:acc.parent.user, pass:acc.parent.pass, role:"parent"};
+        if(acc.child && acc.child.user) map[acc.child.user]={user:acc.child.user, pass:acc.child.pass, role:"child"};
+        return map;
+      }
+      return acc;
+    }
 
     // 合并用户导入的额外句子（按 id 去重）；已打卡记录按 id 保存，导入不影响旧记录
     (function(){
@@ -4002,7 +4022,8 @@ window.SENTENCES = [
     }
 
     // 共享数据
-    var accounts = LS.get("lcs_accounts", null);   // {parent:{user,pass}, child:{user,pass}}
+    var accounts = normalizeAccounts(LS.get("lcs_accounts", null)); // {username:{user,pass,role}}
+    if(accounts) LS.set("lcs_accounts", accounts);
     var session = LS.get("lcs_session", null);     // {role, user}
     var checkins = LS.get("lcs_checkins", {});     // dayId -> {date, photo, file, ts}
 
@@ -4035,10 +4056,20 @@ window.SENTENCES = [
           TOTAL = S.length; changed++;
         }
       }
-      if(payload.accounts && (payload.accounts.parent || payload.accounts.child)){
-        var acc = LS.get("lcs_accounts", null);
-        if(!acc || JSON.stringify(acc) !== JSON.stringify(payload.accounts)){
-          LS.set("lcs_accounts", payload.accounts); accounts = payload.accounts; changed++;
+      if(payload.accounts && typeof payload.accounts === "object"){
+        var acc = LS.get("lcs_accounts", {}) || {};
+        var merged={}, accChanged=false;
+        Object.keys(acc).forEach(function(k){ merged[k]=acc[k]; });
+        Object.keys(payload.accounts).forEach(function(k){
+          var a=payload.accounts[k];
+          if(a && a.user && a.pass){
+            if(!merged[k] || merged[k].pass!==a.pass || merged[k].role!==a.role){ merged[k]=a; accChanged=true; }
+          }
+        });
+        if(accChanged){
+          accounts = normalizeAccounts(merged);
+          LS.set("lcs_accounts", accounts);
+          changed++;
         }
       }
       var ck = LS.get("lcs_checkins", {}) || {};
@@ -4083,45 +4114,52 @@ window.SENTENCES = [
     }
 
     // ---------- 路由 ----------
+    function hasAccounts(){ return accounts && Object.keys(accounts).length > 0; }
     function route(){
-      if(!accounts){ show("setup"); }
+      if(!hasAccounts()){ show("register"); }
       else if(!session){ show("login"); }
       else { show("app"); renderApp(); }
     }
     function show(name){
-      ["setup","login","app"].forEach(function(n){ $(n).classList.toggle("hidden", n!==name); });
+      ["register","login","app"].forEach(function(n){ $(n).classList.toggle("hidden", n!==name); });
       $("mask").classList.add("hidden");
       if(name==="app"){ startSync(); }
       else { if(syncTimer) clearInterval(syncTimer); setSyncStat("off"); }
     }
 
-    // ---------- 创建账号 ----------
-    $("setupBtn").onclick = function(){
-      var pu=$("suParent").value.trim(), pp=$("spParent").value, cu=$("suChild").value.trim(), cp=$("spChild").value;
-      if(!pu||!pp||!cu||!cp){ $("setupErr").textContent="四项都要填写"; return; }
-      if(pp.length<4||cp.length<4){ $("setupErr").textContent="密码至少 4 位"; return; }
-      accounts = { parent:{user:pu, pass:hash(pp)}, child:{user:cu, pass:hash(cp)} };
+    // ---------- 注册账号 ----------
+    var regRole = "child";
+    $("regRoleChild").onclick = function(){ regRole="child"; $("regRoleChild").classList.add("on"); $("regRoleParent").classList.remove("on"); };
+    $("regRoleParent").onclick = function(){ regRole="parent"; $("regRoleParent").classList.add("on"); $("regRoleChild").classList.remove("on"); };
+    $("regBtn").onclick = function(){
+      var u=$("regUser").value.trim(), p=$("regPass").value, p2=$("regPass2").value;
+      if(!u||!p||!p2){ $("regErr").textContent="用户名、密码都要填写"; return; }
+      if(p.length<4){ $("regErr").textContent="密码至少 4 位"; return; }
+      if(p!==p2){ $("regErr").textContent="两次输入的密码不一致"; return; }
+      accounts = accounts || {};
+      if(accounts[u]){ $("regErr").textContent="该用户名已被注册"; return; }
+      accounts[u] = { user:u, pass:hash(p), role:regRole };
       LS.set("lcs_accounts", accounts);
-      session = { role:"child", user:cu };
+      session = { role:regRole, user:u };
       LS.set("lcs_session", session);
       route();
     };
+    $("toLogin").onclick = function(){ show("login"); };
 
     // ---------- 登录 ----------
-    var loginRole = "child";
-    $("tabChild").onclick = function(){ loginRole="child"; $("tabChild").classList.add("on"); $("tabParent").classList.remove("on"); };
-    $("tabParent").onclick = function(){ loginRole="parent"; $("tabParent").classList.add("on"); $("tabChild").classList.remove("on"); };
     $("loginBtn").onclick = function(){
       var u=$("liUser").value.trim(), p=$("liPass").value;
-      var acc = accounts[loginRole];
-      if(!acc || u!==acc.user || hash(p)!==acc.pass){ $("loginErr").textContent="用户名或密码不正确"; return; }
-      session = { role:loginRole, user:u };
+      var acc = accounts ? accounts[u] : null;
+      if(!acc || hash(p)!==acc.pass){ $("loginErr").textContent="用户名或密码不正确"; return; }
+      session = { role:acc.role, user:u };
       LS.set("lcs_session", session);
       route();
     };
+    $("toRegister").onclick = function(){ show("register"); };
 
     $("logoutBtn").onclick = function(){ session=null; LS.set("lcs_session", null); route(); };
-    $("gearBtn").onclick = openSettings;
+    $("setBtn").onclick = openSettings;
+    $("pSetBtn").onclick = openSettings;
 
     // ---------- 应用 ----------
     function renderApp(){
@@ -4131,7 +4169,7 @@ window.SENTENCES = [
         renderChild(childIdx);
       } else {
         $("parentView").classList.remove("hidden"); $("childView").classList.add("hidden");
-        $("roleLabel").textContent="家长 · "+session.user; $("roleSub").textContent="查看 "+accounts.child.user+" 的打卡";
+        $("roleLabel").textContent="家长 · "+session.user; $("roleSub").textContent="查看家庭打卡";
         renderParent();
       }
     }
