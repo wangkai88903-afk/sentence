@@ -16,6 +16,7 @@
   .wrap{max-width:760px;margin:0 auto;padding:14px 14px 60px}
   .hidden{display:none !important}
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 2px 10px rgba(20,30,60,.04)}
+  .warnbox{background:#fff7e6;border:1px solid #ffd591;color:#7a4a00}
   .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(90deg,var(--blue),#5b8def);color:#fff;border-radius:0 0 16px 16px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
   .topbar .role{font-weight:800;font-size:15px}
   .topbar .sub{font-size:12px;opacity:.9}
@@ -195,6 +196,11 @@
           <div class="stat"><div class="n" id="pTotal">0</div><div class="t">孩子已打卡 / 48</div></div>
           <div class="stat"><div class="n" id="pStreak">0</div><div class="t">连续打卡天数</div></div>
           <div class="stat"><div class="n" id="pToday">—</div><div class="t">今天是否打卡</div></div>
+        </div>
+        <div class="card warnbox hidden" id="pCloudHint">
+          <b>⚠️ 尚未加入家庭云</b>
+          <div class="muted" style="margin-top:4px">家长端只有<b>加入孩子所在同一个家庭云口令</b>后，才能同步看到孩子的打卡日历与照片。</div>
+          <div style="margin-top:8px">请点右上角 <b>⚙ 设置 → 加入家庭云</b>，输入孩子端「设置」里显示的口令（格式 <code>XXXXXX-XXXXXXXX</code>）。</div>
         </div>
         <div class="card">
           <div class="row between">
@@ -4109,8 +4115,9 @@ window.SENTENCES = [
     function startSync(){
       if(syncTimer) clearInterval(syncTimer);
       if(!syncAvail()){ setSyncStat("off"); return; }
-      syncPull();
-      syncTimer = setInterval(function(){ syncPull(); }, 5000);
+      // 先把自己本地的打卡记录推回云端（云被清空时自动重建并恢复），再拉取家人的数据
+      syncPush().then(function(){ return syncPull(); });
+      syncTimer = setInterval(function(){ syncPush().then(function(){ return syncPull(); }); }, 5000);
     }
 
     // ---------- 路由 ----------
@@ -4255,6 +4262,8 @@ window.SENTENCES = [
 
     // ========== 家长视图 ==========
     function renderParent(){
+      // 未加入家庭云时给出显眼引导
+      if($("pCloudHint")) $("pCloudHint").classList.toggle("hidden", syncAvail());
       var ids = Object.keys(checkins);
       $("pTotal").textContent = ids.length;
       // 连续天数
