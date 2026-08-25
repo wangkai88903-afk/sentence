@@ -60,6 +60,16 @@ function mergeInto(server, client) {
       if (server.removed.indexOf(u) < 0) server.removed.push(u);
     });
   }
+  // 客户端持久化的黑名单也合并进服务端：服务端重启（内存清空）后，
+  // 任意客户端 self-heal 重建时即可恢复黑名单，被删成员不会"复活"。
+  if (Array.isArray(client.removed) && client.removed.length) {
+    client.removed.forEach(function (u) {
+      if (u && server.removed.indexOf(u) < 0) {
+        server.removed.push(u);
+        if (server.accounts && server.accounts[u]) delete server.accounts[u];
+      }
+    });
+  }
   if (client.checkins && typeof client.checkins === 'object') {
     server.checkins = server.checkins || {};
     Object.keys(client.checkins).forEach(function (k) {
@@ -140,6 +150,10 @@ const server = http.createServer(function (req, res) {
           return sendJSON(res, 401, { ok: false, msg: '家庭口令不正确' });
         }
         if (u === '/api/sync/push') {
+          // 被移出家庭的成员：拒绝接收其数据，并通知客户端自动断开云同步
+          if (body.byUser && fam.removed && fam.removed.indexOf(body.byUser) >= 0) {
+            return sendJSON(res, 200, { ok: false, kicked: true, msg: '你已被移出家庭群组，云同步已断开。' });
+          }
           if (body.payload) mergeInto(fam, body.payload);
         }
         return sendJSON(res, 200, {
