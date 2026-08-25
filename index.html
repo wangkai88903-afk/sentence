@@ -4,6 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>初中英语长难句 · 打卡（家长/孩子）</title>
+<meta name="theme-color" content="#2f6fed" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="长难句打卡" />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
 <style>
   :root{
     --bg:#f4f6fb; --card:#ffffff; --ink:#1f2430; --sub:#6b7280; --line:#e7eaf1;
@@ -97,9 +105,25 @@
   .rec .h{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .pill{font-size:12px;font-weight:800;color:#fff;background:var(--green);border-radius:999px;padding:2px 9px}
   @media(min-width:680px){.mask{align-items:center}.sheet{border-radius:18px;margin:auto}}
+  #boot{position:fixed;inset:0;z-index:100;background:linear-gradient(160deg,#2f6fed,#5b8def);display:flex;align-items:center;justify-content:center;transition:opacity .25s}
+  #boot.hidden{opacity:0;pointer-events:none}
+  .boot-inner{text-align:center;color:#fff}
+  .boot-logo{font-size:56px;margin-bottom:14px}
+  .boot-spin{width:34px;height:34px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:bootspin .8s linear infinite}
+  @keyframes bootspin{to{transform:rotate(360deg)}}
+  .boot-txt{font-size:14px;letter-spacing:2px;opacity:.9}
 </style>
 </head>
 <body>
+  <!-- 启动加载层：在 JS 完成路由、登录/应用渲染前显示 -->
+  <div id="boot">
+    <div class="boot-inner">
+      <div class="boot-logo">📘</div>
+      <div class="boot-spin"></div>
+      <div class="boot-txt">正在加载…</div>
+    </div>
+  </div>
+
   <!-- 注册账号 -->
   <div id="register" class="auth hidden">
     <div class="logo"><div class="e">📘</div><h2>注册账号</h2><div class="muted">创建你的打卡账号，并选择角色</div></div>
@@ -3948,7 +3972,7 @@ window.SENTENCES = [
     // 数据备份 / 恢复
     function exportData(){
       var data = { app:"lcs-checkin", v:1, exportedAt: todayStr(),
-        accounts: accounts, session: session, checkins: checkins, extra: LS.get("lcs_extra", []) };
+        accounts: accounts, session: session, checkins: checkins, removed: removedList, extra: LS.get("lcs_extra", []) };
       var blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
       var a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
@@ -3961,8 +3985,9 @@ window.SENTENCES = [
       if(obj.accounts) LS.set("lcs_accounts", obj.accounts);
       if(obj.session) LS.set("lcs_session", obj.session);
       if(obj.checkins) LS.set("lcs_checkins", obj.checkins);
+      if(Array.isArray(obj.removed)) LS.set("lcs_removed", obj.removed);
       if(obj.extra) LS.set("lcs_extra", obj.extra);
-      accounts = LS.get("lcs_accounts", null); session = LS.get("lcs_session", null); checkins = LS.get("lcs_checkins", {});
+      accounts = LS.get("lcs_accounts", null); session = LS.get("lcs_session", null); checkins = LS.get("lcs_checkins", {}); removedList = LS.get("lcs_removed", []) || [];
       // 重建牌堆
       var allseen = {}; S = (window.SENTENCES||[]).concat((LS.get("lcs_extra", [])||[]).filter(function(x){ if(!x||!x.id||allseen[x.id]) return false; allseen[x.id]=1; return true; }));
       TOTAL = S.length;
@@ -4059,8 +4084,18 @@ window.SENTENCES = [
               var btn=document.createElement("button"); btn.className="btn sm ghost"; btn.textContent="移除";
               btn.onclick=function(){
                 if(!confirm("确定将「"+(a.user||k)+"」移出家庭云？")) return;
-                cloudFetch("/api/sync/push",{familyId:cloud.familyId,familyKey:cloud.familyKey,payload:{accounts:{},checkins:{},extra:[],remove:[k]}})
-                  .then(function(r2){ if(r2.ok){ var ms=$("memStat"); if(ms) ms.textContent="已移除 ✓"; renderParent(); openSettings(); } else { var ms=$("memStat"); if(ms) ms.textContent="移除失败"; } });
+                cloudFetch("/api/sync/push",{familyId:cloud.familyId,familyKey:cloud.familyKey,byUser:session.user,payload:{accounts:{},checkins:{},extra:[],remove:[k],removed:removedList}})
+                  .then(function(r2){
+                    if(r2 && r2.kicked){ handleKicked(r2.msg); return; }
+                    if(r2 && r2.ok){
+                      addRemoved(k);
+                      if(accounts && accounts[k]){ delete accounts[k]; LS.set("lcs_accounts", accounts); }
+                      var ms=$("memStat"); if(ms) ms.textContent="已移除 ✓";
+                      syncPush();
+                      renderParent(); openSettings();
+                    } else { var ms=$("memStat"); if(ms) ms.textContent="移除失败："+(r2&&r2.msg?r2.msg:""); }
+                  })
+                  .catch(function(){ var ms=$("memStat"); if(ms) ms.textContent="移除失败，网络异常"; });
               };
               div.appendChild(btn);
             } else {
@@ -4078,20 +4113,41 @@ window.SENTENCES = [
     if(accounts) LS.set("lcs_accounts", accounts);
     var session = LS.get("lcs_session", null);     // {role, user}
     var checkins = LS.get("lcs_checkins", {});     // dayId -> {date, photo, file, ts}
+    var removedList = LS.get("lcs_removed", []) || []; // 被移出家庭云的用户名黑名单
 
     // ---------- 云同步（家庭共享：家长手机 <-> 孩子平板 实时同步）----------
     var cloud = LS.get("lcs_cloud", null);   // {familyId, familyKey} 或 null
     var syncTimer = null, syncBusy = false;
+    function saveRemoved(){ LS.set("lcs_removed", removedList); }
+    function inRemoved(u){ return removedList.indexOf(u) >= 0; }
+    function addRemoved(u){ if(u && !inRemoved(u)){ removedList.push(u); saveRemoved(); } }
+    function mergeRemoved(arr){
+      if(!Array.isArray(arr)) return;
+      var changed=false;
+      arr.forEach(function(u){ if(u && !inRemoved(u)){ removedList.push(u); changed=true; } });
+      if(changed) saveRemoved();
+    }
     function syncAvail(){ return !!(cloud && cloud.familyId && cloud.familyKey); }
     function cloudFetch(p, data){
+      // 始终返回 JSON body（即使 HTTP 403/401），方便调用方检测 kicked 等标记；网络错误仍会 reject
       return fetch(p, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(data) })
-        .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); });
+        .then(function(r){ return r.json().then(function(j){ return j; }).catch(function(){ return {ok:false}; }); });
     }
     function setSyncStat(state){
       var el = document.getElementById("syncStat"); if(!el) return;
       if(!syncAvail()){ el.style.display="none"; return; }
       var map = { ok:"🟢 已同步", pull:"🔄 同步中", off:"🔴 未连接", err:"⚠️ 同步异常" };
       el.textContent = map[state] || map.ok; el.style.display="";
+    }
+    // 被移出家庭群组的处理：断开云同步并提示
+    function handleKicked(msg){
+      cloud = null; LS.set("lcs_cloud", null);
+      if(syncTimer){ clearInterval(syncTimer); syncTimer = null; }
+      setSyncStat("off");
+      if($("mask")) $("mask").classList.add("hidden");
+      alert(msg || "你已被移出家庭群组，云同步已断开。");
+      if(session && session.role === "child") renderChild(childIdx);
+      else if(session && session.role === "parent") renderParent();
     }
     // 把云端 payload 合并进本机（checkins 按 ts 后写覆盖；extra 按 id 去重；accounts 按角色合并）
     function mergeFromCloud(payload){
@@ -4117,11 +4173,18 @@ window.SENTENCES = [
           TOTAL = S.length; changed++;
         }
       }
+      // 先合并 removed 黑名单（必须在 accounts 合并前生效）
+      if(payload.removed && payload.removed.length){
+        var beforeLen = removedList.length;
+        mergeRemoved(payload.removed);
+        if(removedList.length !== beforeLen) changed++;
+      }
       if(payload.accounts && typeof payload.accounts === "object"){
         var acc = LS.get("lcs_accounts", {}) || {};
         var merged={}, accChanged=false;
         Object.keys(acc).forEach(function(k){ merged[k]=acc[k]; });
         Object.keys(payload.accounts).forEach(function(k){
+          if(inRemoved(k)) return; // 已被移除的成员不再合并回本地
           var a=payload.accounts[k];
           if(a && a.user && a.pass){
             if(!merged[k] || merged[k].pass!==a.pass || merged[k].role!==a.role){ merged[k]=a; accChanged=true; }
@@ -4147,8 +4210,13 @@ window.SENTENCES = [
       if(!syncAvail()) return Promise.resolve(false);
       setSyncStat("pull");
       return cloudFetch("/api/sync/push", { familyId: cloud.familyId, familyKey: cloud.familyKey,
-        payload: { accounts: accounts, checkins: checkins, extra: LS.get("lcs_extra", []) || [] } })
-        .then(function(r){ if(r.ok){ setSyncStat("ok"); return true; } setSyncStat("err"); return false; })
+        byUser: session ? session.user : "",
+        payload: { accounts: accounts, checkins: checkins, extra: LS.get("lcs_extra", []) || [], removed: removedList } })
+        .then(function(r){
+          if(r && r.kicked){ handleKicked(r.msg); return false; }
+          if(r && r.ok){ setSyncStat("ok"); return true; }
+          setSyncStat("err"); return false;
+        })
         .catch(function(){ setSyncStat("off"); return false; });
     }
     function syncPull(){
@@ -4157,7 +4225,8 @@ window.SENTENCES = [
       return cloudFetch("/api/sync/pull", { familyId: cloud.familyId, familyKey: cloud.familyKey })
         .then(function(r){
           syncBusy = false;
-          if(!r.ok){ setSyncStat("off"); return false; }
+          if(!r || !r.ok){ setSyncStat("off"); return false; }
+          if(r.kicked || (session && r.removed && r.removed.indexOf(session.user) >= 0)){ handleKicked(r.msg); return false; }
           var ch = mergeFromCloud(r);
           setSyncStat("ok");
           if(ch){
@@ -4178,10 +4247,16 @@ window.SENTENCES = [
 
     // ---------- 路由 ----------
     function hasAccounts(){ return accounts && Object.keys(accounts).length > 0; }
+    function hideBoot(){
+      var b = $("boot"); if(b){ b.classList.add("hidden"); setTimeout(function(){ b.style.display="none"; }, 260); }
+    }
     function route(){
-      if(!hasAccounts()){ show("register"); }
-      else if(!session){ show("login"); }
-      else { show("app"); renderApp(); }
+      // 默认优先显示登录页；只有从未注册时才通过「去注册」进入注册页。
+      // 已保存 session 且账号仍存在，则直接进入应用（自动登录）。
+      if(session && hasAccounts() && accounts[session.user]){ show("app"); renderApp(); }
+      else { show("login"); }
+      // 短暂保留启动层，避免首次加载出现白闪
+      setTimeout(hideBoot, 180);
     }
     function show(name){
       ["register","login","app"].forEach(function(n){ $(n).classList.toggle("hidden", n!==name); });
@@ -4244,8 +4319,12 @@ window.SENTENCES = [
           accounts = accounts||{};
           accounts[u] = { user:u, pass:hash(np), role: famAcc[u].role || "child" };
           LS.set("lcs_accounts", accounts);
-          cloudFetch("/api/sync/push",{familyId:fid,familyKey:fk,payload:{accounts:accounts, checkins:checkins, extra:LS.get("lcs_extra",[])||[]}})
-            .then(function(){ $("fpErr").style.color=""; $("fpErr").textContent="密码已重置 ✓ 请用新密码登录"; setTimeout(function(){ $("mask").classList.add("hidden"); show("login"); }, 1200); });
+          cloudFetch("/api/sync/push",{familyId:fid,familyKey:fk,byUser:u,payload:{accounts:accounts, checkins:checkins, extra:LS.get("lcs_extra",[])||[], removed:removedList}})
+            .then(function(r){
+              if(r && r.kicked){ handleKicked(r.msg); return; }
+              $("fpErr").style.color="green"; $("fpErr").textContent="密码已重置 ✓ 请用新密码登录";
+              setTimeout(function(){ $("mask").classList.add("hidden"); show("login"); }, 1200);
+            }).catch(function(){ $("fpErr").textContent="网络异常，密码已重置在本地"; });
         }).catch(function(){ $("fpErr").textContent="无法连接同步服务（当前部署可能未包含后端）"; });
       };
     }
