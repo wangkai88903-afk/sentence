@@ -1,5 +1,5 @@
-const CACHE = "lcs-checkin-v1";
-const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.png"];
+const CACHE = "lcs-checkin-v2";
+const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", function (e) {
   self.skipWaiting();
@@ -17,14 +17,17 @@ self.addEventListener("activate", function (e) {
 self.addEventListener("fetch", function (e) {
   var req = e.request;
   if (req.method !== "GET") return;
-  // 导航请求：网络优先，失败回退缓存（保证更新能生效，离线也能开）
+  // 导航请求：优先返回缓存的 App Shell，避免 Render 休眠时长时间白屏/显示默认页；同时后台尝试网络刷新缓存
   if (req.mode === "navigate") {
     e.respondWith(
-      fetch(req).then(function (res) {
-        var cp = res.clone();
-        caches.open(CACHE).then(function (c) { c.put("./index.html", cp); });
-        return res;
-      }).catch(function () { return caches.match("./index.html"); })
+      caches.match("./index.html").then(function (cached) {
+        var network = fetch(req).then(function (res) {
+          var cp = res.clone();
+          caches.open(CACHE).then(function (c) { c.put("./index.html", cp); });
+          return res;
+        }).catch(function () { return cached; });
+        return cached || network;
+      })
     );
     return;
   }
