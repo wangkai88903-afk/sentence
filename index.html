@@ -151,6 +151,7 @@
       <button class="btn block" id="loginBtn">登录</button>
       <div class="err" id="loginErr"></div>
       <div class="auth-link"><span id="forgotPwd">忘记密码？</span> · 还没有账号？<span id="toRegister">去注册</span></div>
+      <div class="auth-link muted" style="margin-top:6px;font-size:13px">换设备登录？<span id="cloudLogin" style="color:#2f6fed">用家庭云口令登录</span></div>
     </div>
   </div>
 
@@ -4288,12 +4289,51 @@ window.SENTENCES = [
     $("loginBtn").onclick = function(){
       var u=$("liUser").value.trim(), p=$("liPass").value;
       var acc = accounts ? accounts[u] : null;
-      if(!acc || hash(p)!==acc.pass){ $("loginErr").textContent="用户名或密码不正确"; return; }
+      if(!acc){ $("loginErr").innerHTML="本机没有「"+esc(u)+"」账号。若该账号已在家庭云中，请点下方「用家庭云口令登录」。"; return; }
+      if(hash(p)!==acc.pass){ $("loginErr").textContent="用户名或密码不正确"; return; }
       session = { role:acc.role, user:u };
       LS.set("lcs_session", session);
       route();
     };
     $("toRegister").onclick = function(){ show("register"); };
+
+    // ---------- 用家庭云口令跨设备登录（在任意设备登录已有账号） ----------
+    function openCloudLogin(){
+      var body=$("maskBody");
+      body.innerHTML='<h3 style="margin:0 0 8px">🌐 用家庭云口令登录</h3>'
+        + '<div class="muted" style="margin-bottom:10px">适用于在<b>新设备</b>登录已有账号：输入用户名、密码和所在「家庭云口令」（形如 K7P2QX-XXXXXXXX），验证通过后本机即可登录，并自动加入家庭云同步打卡记录。</div>'
+        + '<div class="field"><label>用户名</label><input id="clUser" placeholder="用户名"/></div>'
+        + '<div class="field"><label>密码</label><input id="clPass" type="password" placeholder="账号密码"/></div>'
+        + '<div class="field"><label>家庭云口令</label><input id="clKey" placeholder="如 K7P2QX-XXXXXXXX"/></div>'
+        + '<button class="btn block" id="clBtn">登录并同步</button>'
+        + '<div class="err" id="clErr"></div>';
+      $("mask").classList.remove("hidden");
+      $("clBtn").onclick=function(){
+        var u=$("clUser").value.trim(), p=$("clPass").value, v=$("clKey").value.trim().toUpperCase();
+        if(!u||!p||!v){ $("clErr").textContent="用户名、密码、口令都要填写"; return; }
+        var m=v.split("-"); if(m.length<2){ $("clErr").textContent="口令格式应为 XXXXXX-XXXXXXXX"; return; }
+        var fid=m[0], fk=m.slice(1).join("-");
+        cloudFetch("/api/sync/pull",{familyId:fid,familyKey:fk}).then(function(r){
+          if(!r.ok){ $("clErr").textContent="家庭云口令不正确"; return; }
+          var famAcc=r.accounts||{};
+          var a=famAcc[u];
+          if(!a){ $("clErr").textContent="该家庭云中没有名为「"+esc(u)+"」的成员（可能已被移出群组）"; return; }
+          if(hash(p)!==a.pass){ $("clErr").textContent="密码与云端账号不一致（可先点『忘记密码』重置）"; return; }
+          // 保存账号到本机 + 建立家庭云连接 + 合并云端打卡记录
+          accounts = accounts||{};
+          accounts[u] = { user:u, pass:a.pass, role:a.role };
+          LS.set("lcs_accounts", accounts);
+          cloud = { familyId:fid, familyKey:fk };
+          LS.set("lcs_cloud", cloud);
+          mergeFromCloud(r);
+          session = { role:a.role, user:u };
+          LS.set("lcs_session", session);
+          $("mask").classList.add("hidden");
+          route();
+        }).catch(function(){ $("clErr").textContent="无法连接同步服务（当前部署可能未包含后端）"; });
+      };
+    }
+    $("cloudLogin").onclick = openCloudLogin;
 
     // ---------- 用家庭云口令找回密码 ----------
     function openForgotPwd(){
