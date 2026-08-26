@@ -52,6 +52,28 @@ function betterRec(a, b) {
   return a;
 }
 
+// 协作字段（评论/标注/高亮）合并：按 id 去重并集，双向独立保留（不互相覆盖）
+function mergeCollabInto(target, src) {
+  var changed = false;
+  ['comments', 'annotations', 'highlights'].forEach(function (f) {
+    var a = (target[f] || []).slice();
+    var b = (src && src[f]) || [];
+    var seen = {};
+    a.forEach(function (x) { if (x) { var key = x.id || (x.by + ':' + x.ts); seen[key] = 1; } });
+    b.forEach(function (x) {
+      if (!x) return;
+      var key = x.id || (x.by + ':' + x.ts);
+      if (seen[key]) return;
+      seen[key] = 1; a.push(x); changed = true;
+    });
+    if (a.length !== (target[f] ? target[f].length : 0)) {
+      if (a.length) target[f] = a; else delete target[f];
+      changed = true;
+    }
+  });
+  return changed;
+}
+
 function mergeInto(server, client) {
   server.removed = server.removed || [];
   if (Array.isArray(client.remove) && client.remove.length) {
@@ -75,7 +97,10 @@ function mergeInto(server, client) {
     Object.keys(client.checkins).forEach(function (k) {
       var c = client.checkins[k];
       var s = server.checkins[k];
-      server.checkins[k] = betterRec(c, s);
+      var base = betterRec(c, s);
+      var other = (base === c) ? s : c;
+      mergeCollabInto(base, other || {});
+      server.checkins[k] = base;
     });
   }
   if (Array.isArray(client.extra) && client.extra.length) {
@@ -106,7 +131,7 @@ function sendJSON(res, code, obj) {
 function readBody(req, cb) {
   var chunks = [];
   req.on('data', function (c) { chunks.push(c); if (Buffer.concat(chunks).length > 12 * 1024 * 1024) req.destroy(); });
-  req.on('end', function () { try { cb(null, JSON.parse(Buffer.concat(chunks).toString('utf-8'))); } catch (e) { cb(e); } });
+  req.on('end', function () { var raw=Buffer.concat(chunks).toString('utf-8'); try { cb(null, JSON.parse(raw)); } catch (e) { cb(e); } });
 }
 function staticFile(res, urlPath) {
   var rel = urlPath === '/' ? '/index.html' : urlPath;
