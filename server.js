@@ -158,6 +158,7 @@ const server = http.createServer(function (req, res) {
         }
         return sendJSON(res, 200, {
           ok: true, updatedAt: fam.updatedAt,
+          cnt: fam.checkins ? Object.keys(fam.checkins).length : 0, // 云端打卡记录总数（客户端据此判断是否需要全量补推）
           accounts: fam.accounts, checkins: fam.checkins || {}, extra: fam.extra || [],
           removed: fam.removed || []
         });
