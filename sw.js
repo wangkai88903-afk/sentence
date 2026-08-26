@@ -1,4 +1,4 @@
-const CACHE = "lcs-checkin-v3";
+const CACHE = "lcs-checkin-v4";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", function (e) {
