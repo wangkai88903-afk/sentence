@@ -4185,6 +4185,17 @@ window.SENTENCES = [
         if(!!a.deleted !== !!b.deleted) return a.deleted?a:b;
         return a;
       }
+      // 协作字段（评论/标注/高亮）合并：按 id 去重并集，双向独立保留（不互相覆盖）
+      function mergeCollabInto(target, src){
+        var changed=false;
+        ["comments","annotations","highlights"].forEach(function(f){
+          var a=(target[f]||[]).slice(), b=(src && src[f])||[], seen={};
+          a.forEach(function(x){ if(x){ var k=x.id||(x.by+":"+x.ts); seen[k]=1; } });
+          b.forEach(function(x){ if(!x) return; var k=x.id||(x.by+":"+x.ts); if(seen[k]) return; seen[k]=1; a.push(x); changed=true; });
+          if(a.length !== (target[f]?target[f].length:0)){ if(a.length) target[f]=a; else delete target[f]; changed=true; }
+        });
+        return changed;
+      }
       if(Array.isArray(payload.extra) && payload.extra.length){
         var ex = LS.get("lcs_extra", []) || [];
         var seen = {}; ex.forEach(function(x){ if(x&&x.id) seen[x.id]=1; }); S.forEach(function(x){ if(x&&x.id) seen[x.id]=1; });
@@ -4223,8 +4234,10 @@ window.SENTENCES = [
       var pc = payload.checkins || {};
       Object.keys(pc).forEach(function(k){
         var c = pc[k], s = ck[k];
-        var win = betterRec(c, s);
-        if(win !== s){ ck[k] = win; changed++; }
+        var base = betterRec(c, s);
+        var other = (base === c) ? s : c;
+        var collabChanged = mergeCollabInto(base, other || {});
+        if(base !== s || collabChanged){ ck[k] = base; changed++; }
       });
       if(changed){ LS.set("lcs_checkins", ck); checkins = ck; }
       return changed;
@@ -4499,6 +4512,7 @@ window.SENTENCES = [
           $("correctedPhoto").src=ck.correctedPhoto;
           $("correctedPhoto").onclick=function(){ openImg(ck.correctedPhoto); };
         } else { $("correctedBox").classList.add("hidden"); $("correctedPhoto").onclick=null; }
+        initChildHighlight();
         fillAnalysis(s);
         $("analysis").classList.add("show");
       } else {
@@ -4638,13 +4652,14 @@ window.SENTENCES = [
       return m[t] || "#64748b";
     }
     function fillAnalysis(s){
-      $("transBox").textContent = s.translation;
+      var hl=(checkins[s.id]&&checkins[s.id].highlights)||[];
+      $("transBox").innerHTML = highlightWrap(s.translation, hl);
       // 结构拆解
       var tb=$("treeBox"); tb.innerHTML="";
       (s.analysis||[]).forEach(function(n){
         var d=document.createElement("div"); d.className="node";
         d.innerHTML='<span class="lab" style="background:'+labelColor(n.type)+'">'+esc(n.type)+'</span>'
-          + '<b>'+esc(n.text)+'</b><div class="muted" style="margin-top:3px">'+esc(n.note)+'</div>';
+          + '<b>'+highlightWrap(n.text, hl)+'</b><div class="muted" style="margin-top:3px">'+highlightWrap(n.note, hl)+'</div>';
         tb.appendChild(d);
       });
       // 成分分析
@@ -4652,18 +4667,18 @@ window.SENTENCES = [
       if(s.components && s.components.length){
         var html='<table class="cmp"><thead><tr><th>成分</th><th>对应词 / 结构</th><th>说明</th></tr></thead><tbody>';
         s.components.forEach(function(c){
-          html+='<tr><td><b>'+esc(c.role)+'</b></td><td>'+esc(c.text)+'</td><td class="muted">'+esc(c.note)+'</td></tr>';
+          html+='<tr><td><b>'+esc(c.role)+'</b></td><td>'+highlightWrap(c.text, hl)+'</td><td class="muted">'+highlightWrap(c.note, hl)+'</td></tr>';
         });
         html+='</tbody></table>'; cb.innerHTML=html;
       } else { cb.innerHTML='<div class="muted">（暂无）</div>'; }
       // 语法点
       var gb=$("gpBox"); gb.innerHTML="";
-      (s.grammar||[]).forEach(function(g){ var d=document.createElement("div"); d.className="node"; d.textContent="• "+g; gb.appendChild(d); });
+      (s.grammar||[]).forEach(function(g){ var d=document.createElement("div"); d.className="node"; d.innerHTML='• '+highlightWrap(g, hl); gb.appendChild(d); });
       // 单词
       var wb=$("wordBox"); wb.innerHTML="";
       (s.words||[]).forEach(function(w){
         var d=document.createElement("div"); d.className="word";
-        d.innerHTML='<b>'+esc(w.w)+'</b> <i>'+esc(w.pos)+'</i> '+esc(w.m);
+        d.innerHTML='<b>'+highlightWrap(w.w, hl)+'</b> <i>'+esc(w.pos)+'</i> '+highlightWrap(w.m, hl);
         wb.appendChild(d);
       });
     }
@@ -4731,7 +4746,7 @@ window.SENTENCES = [
           + (ck.file?'<span class="muted">'+esc(ck.file)+'</span>':'')+'</div>'
           + '<div class="sentence" style="font-size:16px">'+esc(s.sentence)+'</div>'
           + (ck.photo?'<img class="photo" src="'+ck.photo+'" style="max-width:220px" alt="照片"/>':'<div class="muted">（无照片）</div>')
-          + '<div style="margin-top:8px">'+analysisHTML(s)+'</div></div>';
+          + '<div style="margin-top:8px">'+analysisHTML(s, k)+'</div></div>';
       });
       body.innerHTML=html;
       $("mask").classList.remove("hidden");
@@ -4740,34 +4755,166 @@ window.SENTENCES = [
       if(!src) return;
       var v=$("imgView"); v.querySelector("img").src=src; v.classList.remove("hidden");
     }
+    // ===== 协作功能：评论 / 照片标注 / 分析高亮 =====
+    function ensureCollabCss(){
+      if(document.getElementById("collabCss")) return;
+      var st=document.createElement("style"); st.id="collabCss";
+      st.textContent=".phwrap{position:relative;display:inline-block;line-height:0}"
+        +".annCanvas{position:absolute;left:0;top:0;pointer-events:none;touch-action:none}"
+        +".annCanvas.ann-on{pointer-events:auto;cursor:crosshair}"
+        +".annBar{margin:8px 0;display:flex;gap:6px;align-items:center;flex-wrap:wrap}"
+        +".annBar .active{background:#2f6fed;color:#fff}"
+        +".cmtBox{margin-top:14px;border-top:1px solid #e2e8f0;padding-top:10px}"
+        +".cmtHead{font-weight:600;margin-bottom:6px;font-size:14px}"
+        +".cmtList{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow:auto}"
+        +".cmt{background:#f1f5f9;border-radius:8px;padding:6px 9px;font-size:13px;line-height:1.5}"
+        +".cmt .who{font-weight:600;color:#2f6fed;margin-right:4px}"
+        +".cmt .when{color:#94a3b8;font-size:11px;margin-left:6px}"
+        +"mark.hl{background:#fde047;color:inherit;border-radius:3px;padding:0 1px}"
+        +".hlBtn{position:fixed;z-index:10000;background:#2f6fed;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.25)}";
+      document.head.appendChild(st);
+    }
+    function touchCollab(sid){
+      if(checkins[sid]){ checkins[sid].ts=Date.now(); LS.set("lcs_checkins", checkins); }
+    }
+    function photoWrap(src, target){
+      return '<div class="phwrap"><img class="photo" src="'+src+'" style="max-width:240px;display:block" alt="照片" id="ph_'+target+'"/>'
+        +'<canvas class="annCanvas" id="cv_'+target+'"></canvas></div>';
+    }
+    function bindPhotoZoom(){
+      ["photo","corrected"].forEach(function(t){
+        var img=document.getElementById("ph_"+t); if(!img) return;
+        img.onclick=function(){ var cv=document.getElementById("cv_"+t); if(cv&&cv.classList.contains("ann-on")) return; openImg(img.src); };
+      });
+    }
+    function renderAnnotations(sid, target){
+      var cv=document.getElementById("cv_"+target); if(!cv) return;
+      var img=document.getElementById("ph_"+target); if(!img) return;
+      function draw(){
+        var w=img.clientWidth||240, ratio=(img.naturalHeight&&img.naturalWidth)?img.naturalHeight/img.naturalWidth:0.75, h=Math.round(w*ratio);
+        cv.width=w; cv.height=h; cv.style.width=w+"px"; cv.style.height=h+"px";
+        var ctx=cv.getContext("2d"); ctx.clearRect(0,0,w,h);
+        var rec=checkins[sid]; if(!rec||!rec.annotations) return;
+        rec.annotations.filter(function(a){ return a.target===target; }).forEach(function(a){
+          ctx.strokeStyle=a.color||"#ef4444"; ctx.fillStyle=a.color||"#ef4444";
+          if(a.type==="text"){ ctx.font="bold "+(a.size||18)+"px sans-serif"; ctx.textBaseline="top"; ctx.fillText(a.text||"", a.x*w, a.y*h); }
+          else if(a.type==="path" && a.data){ a.data.forEach(function(st){ if(!st.pts||!st.pts.length) return; ctx.lineWidth=st.w||a.w||3; ctx.strokeStyle=st.color||a.color||"#ef4444"; ctx.lineCap="round"; ctx.lineJoin="round"; ctx.beginPath(); st.pts.forEach(function(p,idx){ var x=p[0]*w,y=p[1]*h; if(idx===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke(); }); }
+        });
+      }
+      if(img.complete) draw(); else img.onload=draw;
+    }
+    function bindAnnotate(sid){
+      var bar=$("annBar"); if(!bar) return;
+      var mode="pen", color="#ef4444", w=3, drawing=false, cur=null;
+      function setMode(m){ mode=m; var p=$("annPen"), t=$("annTxt"); if(p)p.classList.toggle("active",m==="pen"); if(t)t.classList.toggle("active",m==="text"); }
+      function turnOn(on){ ["cv_photo","cv_corrected"].forEach(function(id){ var c=$(id); if(c) c.classList.toggle("ann-on", on); }); }
+      var ci=$("annColor"); if(ci) ci.oninput=function(){ color=ci.value; };
+      var pen=$("annPen"); if(pen) pen.onclick=function(){ setMode("pen"); turnOn(true); };
+      var tx=$("annTxt"); if(tx) tx.onclick=function(){ setMode("text"); turnOn(true); };
+      var done=$("annDone"); if(done) done.onclick=function(){ turnOn(false); setMode("pen"); syncPush(); toast("标注已保存并同步"); };
+      var undo=$("annUndo"); if(undo) undo.onclick=function(){ var rec=checkins[sid]; if(rec&&rec.annotations&&rec.annotations.length){ rec.annotations.pop(); touchCollab(sid); LS.set("lcs_checkins",checkins); renderAnnotations(sid,"photo"); renderAnnotations(sid,"corrected"); syncPush(); } };
+      ["photo","corrected"].forEach(function(target){
+        var cv=document.getElementById("cv_"+target); if(!cv) return;
+        cv.onpointerdown=function(e){ if(bar.classList.contains("hidden")||!cv.classList.contains("ann-on")) return;
+          var rect=cv.getBoundingClientRect(); var x=(e.clientX-rect.left)/rect.width, y=(e.clientY-rect.top)/rect.height;
+          if(mode==="text"){ var t=prompt("输入标注文字："); if(t&&t.trim()){ checkins[sid].annotations=checkins[sid].annotations||[]; checkins[sid].annotations.push({id:session.user+":"+Date.now()+":"+Math.random().toString(36).slice(2,6), by:session.user, role:session.role, target:target, type:"text", text:t.trim(), x:x, y:y, color:color, size:18, ts:Date.now()}); touchCollab(sid); LS.set("lcs_checkins",checkins); renderAnnotations(sid,target); syncPush(); } return; }
+          drawing=true; cur={color:color, w:w, pts:[[x,y]]};
+        };
+        cv.onpointermove=function(e){ if(!drawing||!cur) return; var rect=cv.getBoundingClientRect(); cur.pts.push([(e.clientX-rect.left)/rect.width,(e.clientY-rect.top)/rect.height]); renderAnnotations(sid,target); };
+        cv.onpointerup=function(){ if(!drawing||!cur) return; drawing=false; if(cur.pts.length>1){ checkins[sid].annotations=checkins[sid].annotations||[]; checkins[sid].annotations.push({id:session.user+":"+Date.now()+":"+Math.random().toString(36).slice(2,6), by:session.user, role:session.role, target:target, type:"path", data:[cur], color:color, w:w, ts:Date.now()}); touchCollab(sid); LS.set("lcs_checkins",checkins); renderAnnotations(sid,target); syncPush(); } cur=null; };
+        cv.onpointerleave=function(){ if(drawing) cv.onpointerup(); };
+      });
+    }
+    function renderComments(sid){
+      var box=$("cmtList"); if(!box) return;
+      var rec=checkins[sid]; var list=((rec&&rec.comments)||[]).slice().sort(function(a,b){ return (a.ts||0)-(b.ts||0); });
+      if(!list.length){ box.innerHTML='<div class="muted" style="font-size:13px">还没有评论，快来点评吧～</div>'; return; }
+      box.innerHTML=list.map(function(c){
+        var rl=c.role==="parent"?"家长":"孩子", when=c.ts?new Date(c.ts).toLocaleString("zh-CN",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"";
+        return '<div class="cmt"><span class="who">'+esc(c.by||"匿名")+'（'+rl+'）</span><span class="when">'+when+'</span><div>'+esc(c.text)+'</div></div>';
+      }).join("");
+      box.scrollTop=box.scrollHeight;
+    }
+    function bindComment(sid){
+      var inp=$("cmtInput"), btn=$("cmtSend"); if(!inp||!btn) return;
+      function send(){ var t=inp.value.trim(); if(!t) return; checkins[sid]=checkins[sid]||{}; checkins[sid].comments=checkins[sid].comments||[]; checkins[sid].comments.push({id:session.user+":"+Date.now(), by:session.user, role:session.role, text:t, ts:Date.now()}); touchCollab(sid); LS.set("lcs_checkins",checkins); renderComments(sid); inp.value=""; syncPush(); }
+      btn.onclick=send; inp.onkeydown=function(e){ if(e.key==="Enter") send(); };
+    }
+    function highlightWrap(text, hl){
+      var t=esc(text); (hl||[]).forEach(function(h){ if(!h||!h.text) return; var f=esc(h.text); if(!f) return; var i=t.indexOf(f); if(i>=0){ t=t.slice(0,i)+'<mark class="hl">'+f+'</mark>'+t.slice(i+f.length); } });
+      return t;
+    }
+    function rerenderAnalysisContainers(sid){
+      var s=S.find(function(x){ return x.id===sid; }); if(!s) return;
+      var an=document.getElementById("analysis"); if(an && an.classList.contains("show")) fillAnalysis(s);
+      var mAn=$("maskBody") && $("maskBody").querySelector(".analysis"); if(mAn && $("mask") && !$("mask").classList.contains("hidden")) mAn.innerHTML=analysisInner(s, sid);
+    }
+    function addHighlight(sid, text){
+      text=text.trim(); if(!text) return;
+      checkins[sid]=checkins[sid]||{}; checkins[sid].highlights=checkins[sid].highlights||[];
+      if(checkins[sid].highlights.some(function(h){ return h.text===text; })){ toast("该内容已高亮"); return; }
+      checkins[sid].highlights.push({id:session.user+":"+Date.now(), by:session.user, text:text, ts:Date.now()});
+      touchCollab(sid); LS.set("lcs_checkins",checkins); rerenderAnalysisContainers(sid); syncPush(); toast("高亮已保存并同步");
+    }
+    function initChildHighlight(){
+      if(window.__hlBound) return; window.__hlBound=true;
+      var box=document.getElementById("analysis"); if(!box) return;
+      var hlBtn=null;
+      function hide(){ if(hlBtn){ hlBtn.remove(); hlBtn=null; } }
+      function show(){ var sel=window.getSelection(); var txt=sel?sel.toString().trim():""; if(!txt||!sel.rangeCount){ hide(); return; }
+        var r=sel.getRangeAt(0).getBoundingClientRect();
+        if(!hlBtn){ hlBtn=document.createElement("button"); hlBtn.className="hlBtn"; hlBtn.textContent="🖍 高亮"; document.body.appendChild(hlBtn); }
+        hlBtn.style.left=Math.max(8,Math.min(window.innerWidth-90, r.left+r.width/2-30))+"px"; hlBtn.style.top=(r.bottom+6)+"px";
+        hlBtn.onclick=function(){ addHighlight(curSid, txt); hide(); sel.removeAllRanges(); };
+      }
+      box.addEventListener("mouseup", show);
+      box.addEventListener("touchend", function(){ setTimeout(show,10); });
+      box.addEventListener("scroll", hide, true);
+    }
     function openDetail(s, ck){
-      var i=S.indexOf(s);
-      var body=$("maskBody");
+      var i=S.indexOf(s); var sid=s.id; var role=session?session.role:"child";
+      var body=$("maskBody"); ensureCollabCss();
       body.innerHTML='<div class="row between"><span class="daybadge">'+dayNo(i)+'</span><span class="muted">'+ck.date+(ck.file?(" · "+esc(ck.file)):"")+'</span></div>'
         + '<div class="sentence" style="font-size:17px">'+esc(s.sentence)+'</div>'
-        + (ck.photo?'<img class="photo" src="'+ck.photo+'" style="max-width:240px;cursor:zoom-in" alt="照片" id="detailPhoto"/>':'')
-        + (ck.correctedPhoto?'<div class="muted" style="margin-top:6px">📝 订正后照片</div><img class="photo" src="'+ck.correctedPhoto+'" style="max-width:240px;cursor:zoom-in" alt="订正照片" id="detailCorrected"/>':'')
-        + analysisHTML(s);
+        + (ck.photo? photoWrap(ck.photo,'photo') : '<div class="muted">（无打卡照片）</div>')
+        + (ck.correctedPhoto? '<div class="muted" style="margin-top:6px">📝 订正后照片</div>'+photoWrap(ck.correctedPhoto,'corrected') : '')
+        + '<div class="annBar hidden" id="annBar"><span class="muted">在照片上标注：</span>'
+          + '<input type="color" id="annColor" value="#ef4444" style="width:30px;height:26px;border:none;background:none;vertical-align:middle"/>'
+          + '<button class="btn sm ghost" id="annPen">✏️ 画笔</button>'
+          + '<button class="btn sm ghost" id="annTxt">🔤 文本</button>'
+          + '<button class="btn sm ghost" id="annUndo">↶ 撤销</button>'
+          + '<button class="btn sm" id="annDone">完成</button></div>'
+        + analysisHTML(s, sid)
+        + (role==="child"? '<div class="row" style="margin-top:10px"><button class="btn sm ghost" id="hlPick">🖍 选中上方分析文字后点此高亮</button></div>' : '')
+        + '<div class="cmtBox"><div class="cmtHead">💬 评论 / 点评 '+(role==="parent"?"（家长点评，孩子可见）":"（可见家长点评）")+'</div>'
+          + '<div id="cmtList" class="cmtList"></div>'
+          + '<div class="row" style="margin-top:6px"><input id="cmtInput" class="inp" placeholder="写评论…" style="flex:1"/>'
+          + '<button class="btn sm" id="cmtSend">发送</button></div></div>';
       $("mask").classList.remove("hidden");
-      var dp=document.getElementById("detailPhoto");
-      if(dp) dp.onclick=function(){ openImg(ck.photo); };
-      var dc=document.getElementById("detailCorrected");
-      if(dc) dc.onclick=function(){ openImg(ck.correctedPhoto); };
+      bindPhotoZoom();
+      renderAnnotations(sid,"photo"); renderAnnotations(sid,"corrected");
+      if(role==="parent"){ $("annBar").classList.remove("hidden"); bindAnnotate(sid); }
+      if(role==="child"){ var hp=$("hlPick"); if(hp) hp.onclick=function(){ var sel=window.getSelection(); var txt=sel?sel.toString().trim():""; if(!txt){ toast("请先选中上方分析里的文字"); return; } var n=sel.anchorNode; var inAn=n&&(n.nodeType===1?n:n.parentElement); if(!inAn||!inAn.closest||!inAn.closest(".analysis")){ toast("请在分析解析区域内选中文字"); return; } addHighlight(sid, txt); }; }
+      renderComments(sid); bindComment(sid);
     }
-    function analysisHTML(s){
-      var h='<div class="sec"><h3><span class="bar"></span>参考译文</h3><div>'+esc(s.translation)+'</div></div>'
+    function analysisInner(s, sid){
+      var hl=(checkins[sid]&&checkins[sid].highlights)||[];
+      var h='<div class="sec"><h3><span class="bar"></span>参考译文</h3><div>'+highlightWrap(s.translation, hl)+'</div></div>'
         + '<div class="sec"><h3><span class="bar"></span>句子结构拆解</h3>';
-      (s.analysis||[]).forEach(function(n){ h+='<div class="node"><span class="lab" style="background:'+labelColor(n.type)+'">'+esc(n.type)+'</span><b>'+esc(n.text)+'</b><div class="muted" style="margin-top:3px">'+esc(n.note)+'</div></div>'; });
+      (s.analysis||[]).forEach(function(n){ h+='<div class="node"><span class="lab" style="background:'+labelColor(n.type)+'">'+esc(n.type)+'</span><b>'+highlightWrap(n.text, hl)+'</b><div class="muted" style="margin-top:3px">'+highlightWrap(n.note, hl)+'</div></div>'; });
       h+='</div><div class="sec"><h3><span class="bar"></span>句子成分分析</h3>';
       if(s.components&&s.components.length){ h+='<table class="cmp"><thead><tr><th>成分</th><th>对应词 / 结构</th><th>说明</th></tr></thead><tbody>';
-        s.components.forEach(function(c){ h+='<tr><td><b>'+esc(c.role)+'</b></td><td>'+esc(c.text)+'</td><td class="muted">'+esc(c.note)+'</td></tr>'; }); h+='</tbody></table>'; }
+        s.components.forEach(function(c){ h+='<tr><td><b>'+esc(c.role)+'</b></td><td>'+highlightWrap(c.text, hl)+'</td><td class="muted">'+highlightWrap(c.note, hl)+'</td></tr>'; }); h+='</tbody></table>'; }
       else h+='<div class="muted">（暂无）</div>';
       h+='</div><div class="sec"><h3><span class="bar"></span>核心语法点</h3>';
-      (s.grammar||[]).forEach(function(g){ h+='<div class="node">• '+esc(g)+'</div>'; });
+      (s.grammar||[]).forEach(function(g){ h+='<div class="node">• '+highlightWrap(g, hl)+'</div>'; });
       h+='</div><div class="sec"><h3><span class="bar"></span>重点单词 / 短语</h3><div class="wordlist">';
-      (s.words||[]).forEach(function(w){ h+='<div class="word"><b>'+esc(w.w)+'</b> <i>'+esc(w.pos)+'</i> '+esc(w.m)+'</div>'; });
+      (s.words||[]).forEach(function(w){ h+='<div class="word"><b>'+highlightWrap(w.w, hl)+'</b> <i>'+esc(w.pos)+'</i> '+highlightWrap(w.m, hl)+'</div>'; });
       h+='</div></div>';
       return h;
+    }
+    function analysisHTML(s, sid){
+      return '<div class="analysis">'+analysisInner(s, sid)+'</div>';
     }
     function openAllSentences(){
       var body=$("maskBody");
