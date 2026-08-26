@@ -4131,14 +4131,36 @@ window.SENTENCES = [
     function syncAvail(){ return !!(cloud && cloud.familyId && cloud.familyKey); }
     function cloudFetch(p, data){
       // 始终返回 JSON body（即使 HTTP 403/401），方便调用方检测 kicked 等标记；网络错误仍会 reject
-      return fetch(p, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(data) })
-        .then(function(r){ return r.json().then(function(j){ return j; }).catch(function(){ return {ok:false}; }); });
+      // 25 秒超时：避免 Render 冷启动时请求无限挂起，导致后续同步全部阻塞
+      var ctrl = ("AbortController" in window) ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, 25000) : null;
+      var opt = { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(data) };
+      if(ctrl) opt.signal = ctrl.signal;
+      return fetch(p, opt)
+        .then(function(r){ return r.json().then(function(j){ return j; }).catch(function(){ return {ok:false}; }); })
+        .finally(function(){ if(timer) clearTimeout(timer); });
     }
     function setSyncStat(state){
       var el = document.getElementById("syncStat"); if(!el) return;
       if(!syncAvail()){ el.style.display="none"; return; }
       var map = { ok:"🟢 已同步", pull:"🔄 同步中", off:"🔴 未连接", err:"⚠️ 同步异常" };
       el.textContent = map[state] || map.ok; el.style.display="";
+    }
+    // 轻量 toast：同步失败等重要事件的显式提示（不再静默失败）
+    var toastTimer = null;
+    function toast(msg){
+      var t = document.getElementById("lcsToast");
+      if(!t){
+        t = document.createElement("div"); t.id = "lcsToast";
+        t.style.cssText = "position:fixed;left:50%;bottom:88px;transform:translateX(-50%);z-index:9999;"
+          + "background:rgba(15,23,42,.92);color:#fff;padding:10px 18px;border-radius:10px;font-size:14px;"
+          + "max-width:86%;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.25);opacity:0;"
+          + "transition:opacity .25s;pointer-events:none;";
+        document.body.appendChild(t);
+      }
+      t.textContent = msg; t.style.opacity = "1";
+      if(toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(function(){ t.style.opacity = "0"; }, 3200);
     }
     // 被移出家庭群组的处理：断开云同步并提示
     function handleKicked(msg){
@@ -4207,18 +4229,54 @@ window.SENTENCES = [
       if(changed){ LS.set("lcs_checkins", ck); checkins = ck; }
       return changed;
     }
-    function syncPush(){
+    // 上次成功 push 的时间：用于增量推送（只传最近变更，避免每次全量传照片导致超时）
+    var lastPushOk = LS.get("lcs_pushOkTs", 0) || 0;
+    var pushBusy = false, pushQueued = false;
+    // 构造要推送的 checkins 子集：
+    // - 距上次成功推送超过 10 分钟（或从未推过/被要求强制）→ 全量（云端可能重启清空，需自愈重建）
+    // - 否则只推最近 5 分钟内有变更的记录，大幅减小请求体
+    function buildPushCheckins(force){
+      if(force || !lastPushOk || (Date.now() - lastPushOk) > 600000) return checkins;
+      var now = Date.now(), sub = {};
+      Object.keys(checkins).forEach(function(k){
+        var r = checkins[k];
+        if(r && (r.ts || 0) > now - 300000) sub[k] = r;
+      });
+      return sub;
+    }
+    function syncPush(force){
       if(!syncAvail()) return Promise.resolve(false);
-      setSyncStat("pull");
+      if(pushBusy){ pushQueued = true; return Promise.resolve(false); } // 在途：排队，完成后自动补发
+      pushBusy = true; setSyncStat("pull");
       return cloudFetch("/api/sync/push", { familyId: cloud.familyId, familyKey: cloud.familyKey,
         byUser: session ? session.user : "",
-        payload: { accounts: accounts, checkins: checkins, extra: LS.get("lcs_extra", []) || [], removed: removedList } })
+        payload: { accounts: accounts, checkins: buildPushCheckins(force), extra: LS.get("lcs_extra", []) || [], removed: removedList } })
         .then(function(r){
           if(r && r.kicked){ handleKicked(r.msg); return false; }
-          if(r && r.ok){ setSyncStat("ok"); return true; }
+          if(r && r.ok){
+            lastPushOk = Date.now(); LS.set("lcs_pushOkTs", lastPushOk);
+            // 云端记录总数校验：若云端比本地少（如 Render 重启清空后只增量推了部分），
+            // 立即全量补推一次，实现数据自愈
+            var localCnt = Object.keys(checkins).length;
+            var remoteCnt = (r && typeof r.cnt === "number") ? r.cnt : localCnt;
+            if(typeof r.cnt === "number" && remoteCnt < localCnt){
+              return cloudFetch("/api/sync/push", { familyId: cloud.familyId, familyKey: cloud.familyKey,
+                byUser: session ? session.user : "",
+                payload: { accounts: accounts, checkins: checkins, extra: LS.get("lcs_extra", []) || [], removed: removedList } })
+                .then(function(r2){
+                  if(r2 && r2.kicked){ handleKicked(r2.msg); return false; }
+                  setSyncStat(r2 && r2.ok ? "ok" : "err"); return !!(r2 && r2.ok);
+                });
+            }
+            setSyncStat("ok"); return true;
+          }
           setSyncStat("err"); return false;
         })
-        .catch(function(){ setSyncStat("off"); return false; });
+        .catch(function(){ setSyncStat("off"); return false; })
+        .finally(function(){
+          pushBusy = false;
+          if(pushQueued){ pushQueued = false; syncPush(); } // 补发排队中的推送（含最新数据）
+        });
     }
     function syncPull(){
       if(!syncAvail() || syncBusy) return Promise.resolve(false);
@@ -4245,6 +4303,17 @@ window.SENTENCES = [
       syncPush().then(function(){ return syncPull(); });
       syncTimer = setInterval(function(){ syncPush().then(function(){ return syncPull(); }); }, 5000);
     }
+    // 手机/平板 PWA 切后台后浏览器会冻结定时器，同步可能中断；
+    // 切回前台或网络恢复时立即强制全量推送+拉取，保证漏推的打卡记录自动补上
+    document.addEventListener("visibilitychange", function(){
+      if(document.visibilityState === "visible" && session && syncAvail()){
+        lastPushOk = 0; // 清零 → 下一次 push 自动全量（配合云端 cnt 校验自愈）
+        syncPush(true).then(function(){ return syncPull(); });
+      }
+    });
+    window.addEventListener("online", function(){
+      if(session && syncAvail()){ syncPush(true).then(function(){ return syncPull(); }); }
+    });
 
     // ---------- 路由 ----------
     function hasAccounts(){ return accounts && Object.keys(accounts).length > 0; }
@@ -4447,11 +4516,11 @@ window.SENTENCES = [
       reader.onload = function(){
         var img = new Image();
         img.onload = function(){
-          var w=img.width, h=img.height, max=480, scale=Math.min(1, max/Math.max(w,h));
+          var w=img.width, h=img.height, max=440, scale=Math.min(1, max/Math.max(w,h));
           var cw=Math.round(w*scale), ch=Math.round(h*scale);
           var cv=document.createElement("canvas"); cv.width=cw; cv.height=ch;
           cv.getContext("2d").drawImage(img,0,0,cw,ch);
-          curPhoto = cv.toDataURL("image/jpeg", 0.82);
+          curPhoto = cv.toDataURL("image/jpeg", 0.75);
           $("photoPreview").innerHTML = '<img class="photo" src="'+curPhoto+'" alt="预览"/>';
           $("confirmBtn").disabled = false;
         };
@@ -4478,7 +4547,8 @@ window.SENTENCES = [
       }
       LS.set("lcs_checkins", checkins);
       renderChild(childIdx);
-      syncPush();
+      // 打卡数据必须同步到云端（家长端依赖）：失败时明确告知已本地保存、会自动重试
+      syncPush().then(function(ok){ if(!ok) toast("⚠️ 云同步暂未成功，打卡已保存在本机，稍后自动重试"); });
     };
 
     $("recheckBtn").onclick = function(){
