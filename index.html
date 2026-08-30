@@ -4195,10 +4195,23 @@ window.SENTENCES = [
       if(session && session.role === "child") renderChild(childIdx);
       else if(session && session.role === "parent") renderParent();
     }
+    function deepEqual(a, b){
+      if(a === b) return true;
+      if(typeof a !== "object" || typeof b !== "object" || !a || !b) return false;
+      if(Array.isArray(a) !== Array.isArray(b)) return false;
+      var ka = Object.keys(a), kb = Object.keys(b);
+      if(ka.length !== kb.length) return false;
+      for(var i=0;i<ka.length;i++){
+        var k = ka[i];
+        if(kb.indexOf(k) < 0) return false;
+        if(!deepEqual(a[k], b[k])) return false;
+      }
+      return true;
+    }
     // 把云端 payload 合并进本机（checkins 按 ts 后写覆盖；extra 按 id 去重；accounts 按角色合并）
     function mergeFromCloud(payload){
-      if(!payload) return 0;
-      var changed = 0;
+      if(!payload) return {changed:0, checkins:0};
+      var changed = 0, checkinChanged = 0;
       // 选出更完整/更新的打卡记录（与 server 端一致）：ts 大者优先；ts 相等保留带订正照片者
       function betterRec(a, b){
         if(!a) return b || null; if(!b) return a;
@@ -4260,10 +4273,10 @@ window.SENTENCES = [
         var base = betterRec(c, s);
         var other = (base === c) ? s : c;
         var collabChanged = mergeCollabInto(base, other || {});
-        if(base !== s || collabChanged){ ck[k] = base; changed++; }
+        if(!deepEqual(base, s) || collabChanged){ ck[k] = base; changed++; checkinChanged++; }
       });
       if(changed){ LS.set("lcs_checkins", ck); checkins = ck; }
-      return changed;
+      return {changed:changed, checkins:checkinChanged};
     }
     // 上次成功 push 的时间：用于增量推送（只传最近变更，避免每次全量传照片导致超时）
     var lastPushOk = LS.get("lcs_pushOkTs", 0) || 0;
@@ -4329,7 +4342,9 @@ window.SENTENCES = [
           syncBusy = false;
           if(!r || !r.ok){ setSyncStat("off"); return false; }
           if(r.kicked || (session && r.removed && r.removed.indexOf(session.user) >= 0)){ handleKicked(r.msg); return false; }
-          var ch = mergeFromCloud(r);
+          var merged = mergeFromCloud(r);
+          var ch = merged.changed;
+          var newCheckins = merged.checkins;
           setSyncStat("ok");
           // 响应「请补推」信号：云端拉取请求时间晚于本机上次成功推送，
           // 说明有设备想要最新数据且本机可能还有未推内容 → 立即把本机最新数据推上去。
@@ -4338,7 +4353,7 @@ window.SENTENCES = [
             if(session && session.role === "child") renderChild(childIdx);
             else if(session && session.role === "parent") renderParent();
           }
-          return ch > 0;
+          return newCheckins > 0;
         })
         .catch(function(){ syncBusy = false; setSyncStat("off"); return false; });
     }
