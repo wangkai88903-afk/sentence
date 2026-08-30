@@ -4267,6 +4267,10 @@ window.SENTENCES = [
     }
     // 上次成功 push 的时间：用于增量推送（只传最近变更，避免每次全量传照片导致超时）
     var lastPushOk = LS.get("lcs_pushOkTs", 0) || 0;
+    // 待同步标记：任一次推送尝试置 true，成功推到云端才清除。
+    // 用于应对「打卡后平板立即息屏/后台，导致那次立即推送被中断、5s 轮询被冻结不再重试」的缺口：
+    // 只要标记还在，孩子端下次「上线/回到前台/联网」即强制全量补推，保证云端始终有最新数据。
+    var dirtyPush = LS.get("lcs_dirtyPush", false);
     var pushBusy = false, pushQueued = false;
     // 构造要推送的 checkins 子集：
     // - 距上次成功推送超过 10 分钟（或从未推过/被要求强制）→ 全量（云端可能重启清空，需自愈重建）
@@ -4284,6 +4288,7 @@ window.SENTENCES = [
       if(!syncAvail()) return Promise.resolve(false);
       if(pushBusy){ pushQueued = true; return Promise.resolve(false); } // 在途：排队，完成后自动补发
       pushBusy = true; setSyncStat("pull");
+      dirtyPush = true; LS.set("lcs_dirtyPush", true); // 标记有待同步；成功推送后清除
       return cloudFetch("/api/sync/push", { familyId: cloud.familyId, familyKey: cloud.familyKey,
         byUser: session ? session.user : "",
         requestPull: !!(opts && opts.requestPull), // 打「请各设备补推」信号
@@ -4292,6 +4297,7 @@ window.SENTENCES = [
           if(r && r.kicked){ handleKicked(r.msg); return false; }
           if(r && r.ok){
             lastPushOk = Date.now(); LS.set("lcs_pushOkTs", lastPushOk);
+            dirtyPush = false; LS.set("lcs_dirtyPush", false); // 已成功推到云端，清除待同步标记
             // 云端记录总数校验：若云端比本地少（如 Render 重启清空后只增量推了部分），
             // 立即全量补推一次，实现数据自愈
             var localCnt = Object.keys(checkins).length;
@@ -4340,7 +4346,8 @@ window.SENTENCES = [
       if(syncTimer) clearInterval(syncTimer);
       if(!syncAvail()){ setSyncStat("off"); return; }
       // 先把自己本地的打卡记录推回云端（云被清空时自动重建并恢复），再拉取家人的数据
-      syncPush().then(function(){ return syncPull(); });
+      // 若有「待同步」标记（上次打卡/订正后推送被中断），开 App 即强制全量补推，保证云端有最新数据
+      syncPush(dirtyPush).then(function(){ return syncPull(); });
       syncTimer = setInterval(function(){ syncPush().then(function(){ return syncPull(); }); }, 5000);
     }
     // 手机/平板 PWA 切后台后浏览器会冻结定时器，同步可能中断；
@@ -4354,6 +4361,10 @@ window.SENTENCES = [
     window.addEventListener("online", function(){
       if(session && syncAvail()){ syncPush(true).then(function(){ return syncPull(); }); }
     });
+    // 息屏/页面冻结前的最佳努力推送：孩子打卡后立刻锁屏时，尽量把那次请求发出去；
+    // 即使被系统杀掉，dirtyPush 标记仍在，解锁回到前台（visibilitychange）会强制全量补推兜底。
+    document.addEventListener("pagehide", function(){ if(session && syncAvail()){ syncPush(); } });
+    window.addEventListener("freeze", function(){ if(session && syncAvail()){ syncPush(); } });
 
     // ---------- 路由 ----------
     function hasAccounts(){ return accounts && Object.keys(accounts).length > 0; }
