@@ -4345,9 +4345,9 @@ window.SENTENCES = [
     function startSync(){
       if(syncTimer) clearInterval(syncTimer);
       if(!syncAvail()){ setSyncStat("off"); return; }
-      // 先把自己本地的打卡记录推回云端（云被清空时自动重建并恢复），再拉取家人的数据
-      // 若有「待同步」标记（上次打卡/订正后推送被中断），开 App 即强制全量补推，保证云端有最新数据
-      syncPush(dirtyPush).then(function(){ return syncPull(); });
+      // 进入应用即强制全量推送：把本机所有打卡/订正/协作数据推回云端（云被清空时自动重建并恢复），
+      // 保证孩子端每次打开 App 云端都有最新数据，家长端随后手动同步即可随时拉取
+      syncPush(true).then(function(){ return syncPull(); });
       syncTimer = setInterval(function(){ syncPush().then(function(){ return syncPull(); }); }, 5000);
     }
     // 手机/平板 PWA 切后台后浏览器会冻结定时器，同步可能中断；
