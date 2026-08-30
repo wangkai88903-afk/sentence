@@ -4114,10 +4114,21 @@ window.SENTENCES = [
         var btn = $("cloudSyncNow"), st = $("syncNowStat");
         if(btn) btn.disabled = true;
         if(st) st.textContent = "同步中…";
-        syncPush(true).then(function(){ return syncPull(); }).then(function(ch){
-          if(st) st.textContent = ch ? "已同步 ✓（拉取到新内容）" : "已同步 ✓（无新内容）";
-          if(ch && session && session.role==="parent") renderParent();
-        }).catch(function(){ if(st) st.textContent = "同步失败，请检查网络"; }).finally(function(){ if(btn) btn.disabled = false; });
+        function finish(got){
+          if(st) st.textContent = got ? "已同步 ✓（已拉取孩子新打卡）" : "已同步 ✓（云端暂无孩子的新内容）";
+          if(got && session && session.role==="parent") renderParent();
+        }
+        // 推本机 + 打「请补推」信号 → 拉云端 → 等待孩子端把新打卡推上来后，再补拉两次确保拿到
+        syncPush(true, {requestPull:true}).then(function(){ return syncPull(); }).then(function(ch){
+          return new Promise(function(resolve){
+            var got = ch;
+            setTimeout(function(){ syncPull().then(function(c2){ got = got || c2;
+              setTimeout(function(){ syncPull().then(function(c3){ got = got || c3; resolve(got); }); }, 4000);
+            }); }, 3500);
+          });
+        }).then(function(got){ finish(got); })
+          .catch(function(){ if(st) st.textContent = "同步失败，请检查网络"; })
+          .finally(function(){ if(btn) btn.disabled = false; });
       });
     }
 
@@ -4269,12 +4280,13 @@ window.SENTENCES = [
       });
       return sub;
     }
-    function syncPush(force){
+    function syncPush(force, opts){
       if(!syncAvail()) return Promise.resolve(false);
       if(pushBusy){ pushQueued = true; return Promise.resolve(false); } // 在途：排队，完成后自动补发
       pushBusy = true; setSyncStat("pull");
       return cloudFetch("/api/sync/push", { familyId: cloud.familyId, familyKey: cloud.familyKey,
         byUser: session ? session.user : "",
+        requestPull: !!(opts && opts.requestPull), // 打「请各设备补推」信号
         payload: { accounts: accounts, checkins: buildPushCheckins(force), extra: LS.get("lcs_extra", []) || [], removed: removedList } })
         .then(function(r){
           if(r && r.kicked){ handleKicked(r.msg); return false; }
@@ -4313,6 +4325,9 @@ window.SENTENCES = [
           if(r.kicked || (session && r.removed && r.removed.indexOf(session.user) >= 0)){ handleKicked(r.msg); return false; }
           var ch = mergeFromCloud(r);
           setSyncStat("ok");
+          // 响应「请补推」信号：云端拉取请求时间晚于本机上次成功推送，
+          // 说明有设备想要最新数据且本机可能还有未推内容 → 立即把本机最新数据推上去。
+          if(r.pullReq && r.pullReq > lastPushOk){ syncPush(true); }
           if(ch){
             if(session && session.role === "child") renderChild(childIdx);
             else if(session && session.role === "parent") renderParent();
