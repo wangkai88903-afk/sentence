@@ -180,12 +180,16 @@ const server = http.createServer(function (req, res) {
             return sendJSON(res, 200, { ok: false, kicked: true, msg: '你已被移出家庭群组，云同步已断开。' });
           }
           if (body.payload) mergeInto(fam, body.payload);
+          // 任一端发起「请各设备补推」信号（家长端手动同步时打标），
+          // 其他端在下次 pull 看到该信号且自己尚未推过，便立即把本地最新数据推上来。
+          if (body.requestPull) fam.pullReq = Date.now();
         }
         return sendJSON(res, 200, {
           ok: true, updatedAt: fam.updatedAt,
           cnt: fam.checkins ? Object.keys(fam.checkins).length : 0, // 云端打卡记录总数（客户端据此判断是否需要全量补推）
           accounts: fam.accounts, checkins: fam.checkins || {}, extra: fam.extra || [],
-          removed: fam.removed || []
+          removed: fam.removed || [],
+          pullReq: fam.pullReq || 0 // 告诉各端：若有更新请补推
         });
       }
 
