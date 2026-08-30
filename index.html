@@ -4017,7 +4017,9 @@ window.SENTENCES = [
         + ((cloud && session && session.role==="parent") ? '<hr style="margin:14px 0;border:none;border-top:1px solid #eef"/>'
             + '<div style="margin-bottom:6px"><b>👨‍👩‍👦 家庭群组成员</b></div>'
             + '<div class="muted" id="memStat" style="margin-bottom:8px">正在加载成员…</div>'
-            + '<div id="memList"></div>' : '')
+            + '<div id="memList"></div>'
+            + '<div class="row" style="margin-top:10px"><button class="btn sm" id="cloudSyncNow">🔄 立即手动同步</button>'
+            + '<span class="muted" id="syncNowStat" style="align-self:center"></span></div>' : '')
         + '<div class="muted" id="cloudStat"></div>';
       $("mask").classList.remove("hidden");
       $("setExport").onclick = function(){ exportData(); };
@@ -4107,6 +4109,16 @@ window.SENTENCES = [
           });
         }).catch(function(){ var ms=$("memStat"); if(ms) ms.textContent="无法连接同步服务"; });
       }
+      // 家长：手动立即同步（拉取云端未同步内容，并把自己本地变更推上去）
+      $("cloudSyncNow") && ($("cloudSyncNow").onclick = function(){
+        var btn = $("cloudSyncNow"), st = $("syncNowStat");
+        if(btn) btn.disabled = true;
+        if(st) st.textContent = "同步中…";
+        syncPush(true).then(function(){ return syncPull(); }).then(function(ch){
+          if(st) st.textContent = ch ? "已同步 ✓（拉取到新内容）" : "已同步 ✓（无新内容）";
+          if(ch && session && session.role==="parent") renderParent();
+        }).catch(function(){ if(st) st.textContent = "同步失败，请检查网络"; }).finally(function(){ if(btn) btn.disabled = false; });
+      });
     }
 
     // 共享数据
