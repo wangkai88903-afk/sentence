@@ -72,39 +72,61 @@ let EMAIL_FAM_CACHE = null; // {map, exp}
 async function familyIdByEmail(bucket, email){
   if(!email) return null;
   const e = String(email).trim().toLowerCase();
-  if(!EMAIL_FAM_CACHE || EMAIL_FAM_CACHE.exp < Date.now()){
-    const map = {};
-    try{
-      const listed = await bucket.list({ prefix:'families/' });
-      for(const obj of (listed.objects||[])){
-        const got = await bucket.get(obj.key); if(!got) continue;
-        let fam; try{ fam = JSON.parse(await got.text()); }catch(_){ continue; }
-        const fid = obj.key.replace(/^families\//,'').replace(/\.json$/,'');
-        const acc = fam.accounts || {};
-        for(const k of Object.keys(acc)){
-          const a = acc[k] || {};
-          if(a.email) map[String(a.email).trim().toLowerCase()] = fid;
-        }
-      }
-    }catch(_){}
-    EMAIL_FAM_CACHE = { map, exp: Date.now() + 60000 };
+  // 缓存命中且未过期则直接返回（即使找不到也返回 null，避免频繁重扫）
+  if(EMAIL_FAM_CACHE && EMAIL_FAM_CACHE.exp >= Date.now()){
+    const v = EMAIL_FAM_CACHE.map[e];
+    if(v !== undefined) return v || null;
   }
-  return EMAIL_FAM_CACHE.map[e] || null;
+  // 缓存未命中/过期：重新扫描 R2 建立邮箱→familyId 映射
+  const map = {};
+  try{
+    const listed = await bucket.list({ prefix:'families/' });
+    for(const obj of (listed.objects||[])){
+      const got = await bucket.get(obj.key); if(!got) continue;
+      let fam; try{ fam = JSON.parse(await got.text()); }catch(_){ continue; }
+      const fid = obj.key.replace(/^families\//,'').replace(/\.json$/,'');
+      const acc = fam.accounts || {};
+      for(const k of Object.keys(acc)){
+        const a = acc[k] || {};
+        if(a.email) map[String(a.email).trim().toLowerCase()] = fid;
+      }
+    }
+  }catch(_){}
+  EMAIL_FAM_CACHE = { map, exp: Date.now() + 60000 };
+  return map[e] || null;
 }
 
-// 鉴权：Supabase JWT（新）优先，familyKey（旧，兼容/回滚）兜底
+// 鉴权：Supabase JWT（新）优先；若邮箱尚未绑定到家庭，可用 familyKey（旧，兼容/回滚）兜底
 async function authorize(request, env, bucket, body){
   const h = request.headers.get('Authorization') || '';
+  let jwtAuth = null;
+  let keyAuth = null;
+
   if(h.startsWith('Bearer ')){
     const payload = await verifySupabaseJWT(h.slice(7), env);
     if(!payload) return { ok:false, code:401, msg:'登录已过期或无效，请重新登录' };
-    if(body && body.familyId){
-      const fid = await familyIdByEmail(bucket, payload.email);
-      if(fid !== body.familyId) return { ok:false, code:403, msg:'无权访问该家庭数据' };
-    }
-    return { ok:true, userId: payload.sub, email: payload.email, via:'jwt' };
+    jwtAuth = { userId: payload.sub, email: payload.email, via:'jwt' };
   }
-  if(body && body.familyKey) return { ok:true, via:'key' };
+
+  // 校验 familyKey（只要提供了就校验，用于兜底）
+  if(body && body.familyKey && body.familyId){
+    const loaded = await loadFamily(bucket, body.familyId);
+    const fam = loaded ? loaded.fam : null;
+    if(fam && fam.keyHash === await keyHash(body.familyKey)){
+      keyAuth = { via:'key' };
+    }
+  }
+
+  if(jwtAuth){
+    if(!body || !body.familyId) return Object.assign({ok:true}, jwtAuth);
+    const fid = await familyIdByEmail(bucket, jwtAuth.email);
+    if(fid === body.familyId) return Object.assign({ok:true}, jwtAuth);
+    // 邮箱未绑定到任何家庭，但本地保存的 familyKey 正确：仍允许访问，方便迁移期用户
+    if(keyAuth) return Object.assign({ok:true}, jwtAuth, {via:'jwt-key'});
+    return { ok:false, code:403, msg:'该邮箱尚未绑定到该家庭。请先在设置中填写此邮箱并同步一次，或退出后用家庭口令重新加入。' };
+  }
+
+  if(keyAuth) return Object.assign({ok:true}, keyAuth);
   return { ok:false, code:401, msg:'缺少凭证' };
 }
 

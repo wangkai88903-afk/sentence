@@ -4217,7 +4217,7 @@ window.SENTENCES = [
       // 家长：列出家庭群组成员并可移除
       if(cloud && session && session.role==="parent"){
         cloudFetch("/api/sync/pull",{familyId:cloud.familyId,familyKey:cloud.familyKey}).then(function(r){
-          if(!r.ok){ var ms=$("memStat"); if(ms) ms.textContent="无法获取成员列表"; return; }
+          if(!r.ok){ var ms=$("memStat"); if(ms) ms.textContent="无法获取成员列表："+(r.msg||"未知错误"); return; }
           var mem=r.accounts||{}, removed=r.removed||[], list=$("memList"); if(!list) return;
           list.innerHTML="";
           var names=Object.keys(mem);
@@ -4250,7 +4250,7 @@ window.SENTENCES = [
             }
             list.appendChild(div);
           });
-        }).catch(function(){ var ms=$("memStat"); if(ms) ms.textContent="无法连接同步服务"; });
+        }).catch(function(e){ var ms=$("memStat"); if(ms) ms.textContent="无法连接同步服务："+(e&&e.message?e.message:"网络异常"); });
       }
       // 家长：手动立即同步（拉取云端未同步内容，并把自己本地变更推上去）
       $("cloudSyncNow") && ($("cloudSyncNow").onclick = function(){
@@ -4633,7 +4633,10 @@ window.SENTENCES = [
         if(!data.session){ $("emLoginErr").textContent="登录失败，请重试"; return; }
         var fam = await sbClaim();
         if(!fam){ $("emLoginErr").textContent="未找到该邮箱对应的家庭，请确认已在设置中填写此邮箱并同步"; return; }
+        var oldCloud = LS.get("lcs_cloud", null);
         cloud = { familyId: fam.familyId, via:'sb' };
+        // 若本机已有该家庭口令，保留下来作为 JWT 授权兜底
+        if(oldCloud && oldCloud.familyKey && oldCloud.familyId === fam.familyId) cloud.familyKey = oldCloud.familyKey;
         LS.set("lcs_cloud", cloud);
         await syncPull();              // 先拉取云端账号/打卡，使本机 accounts 含该邮箱账号
         setSessionByEmail(email);
@@ -4650,7 +4653,12 @@ window.SENTENCES = [
         if(error){ $("emRegErr").textContent=errZh(error); return; }
         if(data.session){
           var fam = await sbClaim();
-          if(fam){ cloud={familyId:fam.familyId,via:'sb'}; LS.set("lcs_cloud",cloud); await syncPull(); setSessionByEmail(email); show("app"); renderApp(); return; }
+          if(fam){
+            var oldCloud = LS.get("lcs_cloud", null);
+            cloud={familyId:fam.familyId,via:'sb'};
+            if(oldCloud && oldCloud.familyKey && oldCloud.familyId === fam.familyId) cloud.familyKey = oldCloud.familyKey;
+            LS.set("lcs_cloud",cloud); await syncPull(); setSessionByEmail(email); show("app"); renderApp(); return;
+          }
         }
         $("emRegErr").style.color="green";
         $("emRegErr").textContent="已发送确认邮件到 "+email+" ，请查收并点击确认链接，然后回到此处用「邮箱登录」。";
