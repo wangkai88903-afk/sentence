@@ -3957,6 +3957,86 @@ window.SENTENCES = [
       get:function(k,d){ try{ var v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },
       set:function(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ alert("本地存储空间不足，请清理浏览器数据或减少照片。"); } }
     };
+
+    // ===== 照片存储层：localStorage 只存打卡元数据，照片字节存 IndexedDB，避免 5~10MB 配额爆满 =====
+    // 内存中 checkins[dayId].photo 照常存在（显示/上传不受影响），仅落盘时剥离，照片字节存 IndexedDB
+    var photoMem = {}; // dayId -> dataURL，与内存 checkins[dayId].photo 同步
+    function openPhotoDB(){
+      return new Promise(function(res, rej){
+        var r = indexedDB.open("lcs_photos_db", 1);
+        r.onupgradeneeded = function(){ var db=r.result; if(!db.objectStoreNames.contains("photos")) db.createObjectStore("photos"); };
+        r.onsuccess = function(){ res(r.result); };
+        r.onerror = function(){ rej(r.error); };
+      });
+    }
+    function idbPutPhoto(dayId, data){
+      openPhotoDB().then(function(db){
+        var tx = db.transaction("photos","readwrite");
+        tx.objectStore("photos").put(data, dayId);
+      }).catch(function(){});
+    }
+    function idbDelPhoto(dayId){
+      openPhotoDB().then(function(db){
+        var tx = db.transaction("photos","readwrite");
+        tx.objectStore("photos").delete(dayId);
+      }).catch(function(){});
+    }
+    function idbGetPhoto(dayId){
+      return new Promise(function(res){
+        openPhotoDB().then(function(db){
+          var tx = db.transaction("photos","readonly");
+          var rq = tx.objectStore("photos").get(dayId);
+          rq.onsuccess = function(){ res(rq.result || null); };
+          rq.onerror = function(){ res(null); };
+        }).catch(function(){ res(null); });
+      });
+    }
+    function syncPhotoMem(){
+      for(var k in checkins){ var c = checkins[k]; if(c && c.photo) photoMem[k] = c.photo; }
+      for(var dk in photoMem){ if(!checkins[dk] || !checkins[dk].photo){ delete photoMem[dk]; idbDelPhoto(dk); } }
+    }
+    function saveCheckins(){
+      syncPhotoMem();
+      var stripped = {};
+      for(var k in checkins){
+        var c = checkins[k];
+        if(!c){ stripped[k] = c; continue; }
+        var c2 = {};
+        for(var p in c){ if(p !== "photo") c2[p] = c[p]; }
+        stripped[k] = c2;
+      }
+      LS.set("lcs_checkins", stripped); // 内存 checkins 仍含 photo，仅持久化层剥离
+      for(var k2 in photoMem){ idbPutPhoto(k2, photoMem[k2]); } // 后台落 IndexedDB，不阻塞
+    }
+    function loadCheckins(){ return LS.get("lcs_checkins", {}); }
+    // 旧版数据迁移：把 localStorage 里内嵌的 photo 移入 IndexedDB，并缩小 localStorage 占用
+    function migratePhotosToIDB(){
+      var changed = false;
+      for(var k in checkins){
+        var c = checkins[k];
+        if(c && c.photo){
+          photoMem[k] = c.photo; idbPutPhoto(k, c.photo);
+          var c2 = {}; for(var p in c){ if(p !== "photo") c2[p] = c[p]; }
+          checkins[k] = c2; changed = true;
+        }
+      }
+      if(changed) saveCheckins();
+    }
+    // 跨会话恢复：从 IndexedDB 把照片填回内存 checkins + photoMem
+    function restorePhotosFromIDB(){
+      var keys = Object.keys(checkins);
+      var jobs = keys.map(function(k){
+        var c = checkins[k];
+        if(c && !c.photo){
+          return idbGetPhoto(k).then(function(p){ if(p){ checkins[k].photo = p; photoMem[k] = p; } });
+        }
+        return Promise.resolve();
+      });
+      return Promise.all(jobs).then(function(){
+        try{ if(session && typeof renderApp === "function" && document.getElementById("app") && !document.getElementById("app").classList.contains("hidden")) renderApp(); }catch(e){}
+      });
+    }
+
     function hash(s){ var h=0; s=String(s); for(var i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))|0; } return "h"+(h>>>0); }
     function normalizeAccounts(acc){
       // 兼容旧版 {parent:{...}, child:{...}}，转换为以用户名为键的新格式
@@ -4012,17 +4092,18 @@ window.SENTENCES = [
       if(!obj || obj.app!=="lcs-checkin"){ alert("不是有效的备份文件"); return false; }
       if(obj.accounts) LS.set("lcs_accounts", obj.accounts);
       if(obj.session) LS.set("lcs_session", obj.session);
-      if(obj.checkins) LS.set("lcs_checkins", obj.checkins);
+      if(obj.checkins){ checkins = obj.checkins; saveCheckins(); }
       if(Array.isArray(obj.removed)) LS.set("lcs_removed", obj.removed);
       if(obj.extra) LS.set("lcs_extra", obj.extra);
       if(obj.cloud) LS.set("lcs_cloud", obj.cloud);
-      accounts = LS.get("lcs_accounts", null); session = LS.get("lcs_session", null); checkins = LS.get("lcs_checkins", {}); removedList = LS.get("lcs_removed", []) || [];
+      accounts = LS.get("lcs_accounts", null); session = LS.get("lcs_session", null); checkins = loadCheckins(); removedList = LS.get("lcs_removed", []) || [];
       cloud = LS.get("lcs_cloud", null);
       // 重建牌堆
       var allseen = {}; S = (window.SENTENCES||[]).concat((LS.get("lcs_extra", [])||[]).filter(function(x){ if(!x||!x.id||allseen[x.id]) return false; allseen[x.id]=1; return true; }));
       TOTAL = S.length;
       // 迁移关键：恢复家庭云后强制全量推送，把本机打卡数据写入新云端（R2）
       if(syncAvail()) syncPush(true).then(function(){ if(session) startSync(); });
+      restorePhotosFromIDB();
       return true;
     }
 
@@ -4198,7 +4279,9 @@ window.SENTENCES = [
     var accounts = normalizeAccounts(LS.get("lcs_accounts", null)); // {username:{user,pass,role}}
     if(accounts) LS.set("lcs_accounts", accounts);
     var session = LS.get("lcs_session", null);     // {role, user}
-    var checkins = LS.get("lcs_checkins", {});     // dayId -> {date, photo, file, ts}
+    var checkins = loadCheckins();     // dayId -> {date, photo, file, ts}；photo 由 IndexedDB 兜底
+    migratePhotosToIDB();    // 旧数据迁移：把 localStorage 内嵌照片挪到 IndexedDB 并缩小占用
+    restorePhotosFromIDB(); // 跨会话恢复照片到内存
     var removedList = LS.get("lcs_removed", []) || []; // 被移出家庭云的用户名黑名单
 
     // ---------- 云同步（家庭共享：家长手机 <-> 孩子平板 实时同步）----------
@@ -4342,7 +4425,7 @@ window.SENTENCES = [
           changed++;
         }
       }
-      var ck = LS.get("lcs_checkins", {}) || {};
+      var ck = loadCheckins() || {};
       var pc = payload.checkins || {};
       Object.keys(pc).forEach(function(k){
         var c = pc[k], s = ck[k];
@@ -4351,7 +4434,7 @@ window.SENTENCES = [
         var collabChanged = mergeCollabInto(base, other || {});
         if(!deepEqual(base, s) || collabChanged){ ck[k] = base; changed++; checkinChanged++; }
       });
-      if(changed){ LS.set("lcs_checkins", ck); checkins = ck; }
+      if(changed){ checkins = ck; saveCheckins(); }
       return {changed:changed, checkins:checkinChanged};
     }
     // 上次成功 push 的时间：用于增量推送（只传最近变更，避免每次全量传照片导致超时）
@@ -4802,7 +4885,7 @@ window.SENTENCES = [
       } else {
         checkins[s.id] = { date: todayStr(), photo: curPhoto, file: curFile, ts: Date.now(), firstTs: Date.now() };
       }
-      LS.set("lcs_checkins", checkins);
+      saveCheckins();
       renderChild(childIdx);
       // 打卡数据必须同步到云端（家长端依赖）：失败时明确告知已本地保存、会自动重试
       syncPush().then(function(ok){ if(!ok) toast("⚠️ 云同步暂未成功，打卡已保存在本机，稍后自动重试"); });
@@ -4881,7 +4964,7 @@ window.SENTENCES = [
       if(!ck || ck.deleted) return;
       if(!confirm("确定删除这条打卡记录吗？\n删除后家长端和孩子端都会移除，孩子可重新打卡。")) return;
       checkins[id] = { ts: Date.now(), deleted: true };
-      LS.set("lcs_checkins", checkins);
+      saveCheckins();
       if(session.role === "parent") renderParent(); else renderChild(childIdx);
       syncPush();
     }
@@ -5016,7 +5099,7 @@ window.SENTENCES = [
       document.head.appendChild(st);
     }
     function touchCollab(sid){
-      if(checkins[sid]){ checkins[sid].ts=Date.now(); LS.set("lcs_checkins", checkins); }
+      if(checkins[sid]){ checkins[sid].ts=Date.now(); saveCheckins(); }
     }
     function photoWrap(src, target){
       return '<div class="phwrap"><img class="photo" src="'+src+'" style="max-width:240px;display:block" alt="照片" id="ph_'+target+'"/>'
@@ -5053,16 +5136,16 @@ window.SENTENCES = [
       var pen=$("annPen"); if(pen) pen.onclick=function(){ setMode("pen"); turnOn(true); };
       var tx=$("annTxt"); if(tx) tx.onclick=function(){ setMode("text"); turnOn(true); };
       var done=$("annDone"); if(done) done.onclick=function(){ turnOn(false); setMode("pen"); syncPush(); toast("标注已保存并同步"); };
-      var undo=$("annUndo"); if(undo) undo.onclick=function(){ var rec=checkins[sid]; if(rec&&rec.annotations&&rec.annotations.length){ rec.annotations.pop(); touchCollab(sid); LS.set("lcs_checkins",checkins); renderAnnotations(sid,"photo"); renderAnnotations(sid,"corrected"); syncPush(); } };
+      var undo=$("annUndo"); if(undo) undo.onclick=function(){ var rec=checkins[sid]; if(rec&&rec.annotations&&rec.annotations.length){ rec.annotations.pop(); touchCollab(sid); saveCheckins(); renderAnnotations(sid,"photo"); renderAnnotations(sid,"corrected"); syncPush(); } };
       ["photo","corrected"].forEach(function(target){
         var cv=document.getElementById("cv_"+target); if(!cv) return;
         cv.onpointerdown=function(e){ if(bar.classList.contains("hidden")||!cv.classList.contains("ann-on")) return;
           var rect=cv.getBoundingClientRect(); var x=(e.clientX-rect.left)/rect.width, y=(e.clientY-rect.top)/rect.height;
-          if(mode==="text"){ var t=prompt("输入标注文字："); if(t&&t.trim()){ checkins[sid].annotations=checkins[sid].annotations||[]; checkins[sid].annotations.push({id:session.user+":"+Date.now()+":"+Math.random().toString(36).slice(2,6), by:session.user, role:session.role, target:target, type:"text", text:t.trim(), x:x, y:y, color:color, size:18, ts:Date.now()}); touchCollab(sid); LS.set("lcs_checkins",checkins); renderAnnotations(sid,target); syncPush(); } return; }
+          if(mode==="text"){ var t=prompt("输入标注文字："); if(t&&t.trim()){ checkins[sid].annotations=checkins[sid].annotations||[]; checkins[sid].annotations.push({id:session.user+":"+Date.now()+":"+Math.random().toString(36).slice(2,6), by:session.user, role:session.role, target:target, type:"text", text:t.trim(), x:x, y:y, color:color, size:18, ts:Date.now()}); touchCollab(sid); saveCheckins(); renderAnnotations(sid,target); syncPush(); } return; }
           drawing=true; cur={color:color, w:w, pts:[[x,y]]};
         };
         cv.onpointermove=function(e){ if(!drawing||!cur) return; var rect=cv.getBoundingClientRect(); cur.pts.push([(e.clientX-rect.left)/rect.width,(e.clientY-rect.top)/rect.height]); renderAnnotations(sid,target); };
-        cv.onpointerup=function(){ if(!drawing||!cur) return; drawing=false; if(cur.pts.length>1){ checkins[sid].annotations=checkins[sid].annotations||[]; checkins[sid].annotations.push({id:session.user+":"+Date.now()+":"+Math.random().toString(36).slice(2,6), by:session.user, role:session.role, target:target, type:"path", data:[cur], color:color, w:w, ts:Date.now()}); touchCollab(sid); LS.set("lcs_checkins",checkins); renderAnnotations(sid,target); syncPush(); } cur=null; };
+        cv.onpointerup=function(){ if(!drawing||!cur) return; drawing=false; if(cur.pts.length>1){ checkins[sid].annotations=checkins[sid].annotations||[]; checkins[sid].annotations.push({id:session.user+":"+Date.now()+":"+Math.random().toString(36).slice(2,6), by:session.user, role:session.role, target:target, type:"path", data:[cur], color:color, w:w, ts:Date.now()}); touchCollab(sid); saveCheckins(); renderAnnotations(sid,target); syncPush(); } cur=null; };
         cv.onpointerleave=function(){ if(drawing) cv.onpointerup(); };
       });
     }
@@ -5078,7 +5161,7 @@ window.SENTENCES = [
     }
     function bindComment(sid){
       var inp=$("cmtInput"), btn=$("cmtSend"); if(!inp||!btn) return;
-      function send(){ var t=inp.value.trim(); if(!t) return; checkins[sid]=checkins[sid]||{}; checkins[sid].comments=checkins[sid].comments||[]; checkins[sid].comments.push({id:session.user+":"+Date.now(), by:session.user, role:session.role, text:t, ts:Date.now()}); touchCollab(sid); LS.set("lcs_checkins",checkins); renderComments(sid); inp.value=""; syncPush(); }
+      function send(){ var t=inp.value.trim(); if(!t) return; checkins[sid]=checkins[sid]||{}; checkins[sid].comments=checkins[sid].comments||[]; checkins[sid].comments.push({id:session.user+":"+Date.now(), by:session.user, role:session.role, text:t, ts:Date.now()}); touchCollab(sid); saveCheckins(); renderComments(sid); inp.value=""; syncPush(); }
       btn.onclick=send; inp.onkeydown=function(e){ if(e.key==="Enter") send(); };
     }
     function highlightWrap(text, hl){
@@ -5095,7 +5178,7 @@ window.SENTENCES = [
       checkins[sid]=checkins[sid]||{}; checkins[sid].highlights=checkins[sid].highlights||[];
       if(checkins[sid].highlights.some(function(h){ return h.text===text; })){ toast("该内容已高亮"); return; }
       checkins[sid].highlights.push({id:session.user+":"+Date.now(), by:session.user, text:text, ts:Date.now()});
-      touchCollab(sid); LS.set("lcs_checkins",checkins); rerenderAnalysisContainers(sid); syncPush(); toast("高亮已保存并同步");
+      touchCollab(sid); saveCheckins(); rerenderAnalysisContainers(sid); syncPush(); toast("高亮已保存并同步");
     }
     function initChildHighlight(){
       if(window.__hlBound) return; window.__hlBound=true;
