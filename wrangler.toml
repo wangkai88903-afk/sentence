@@ -1,0 +1,17 @@
+name = "lcs-checkin-sync"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+account_id = "8c8273abf092fc40abc76970eb129d70"
+workers_dev = false
+
+# R2 存储桶（已在 Cloudflare 控制台创建：lcs-families）
+r2_buckets = [
+  { binding = "lcs_families", bucket_name = "lcs-families" }
+]
+
+# 同源路由：仅 /api/* 走 Worker，其余路径由 Pages 托管（app.englearning.cc）
+# 这样前端仍以相对路径 /api/* 调用，零 CORS、零前端改动。
+# 路由要求 app.englearning.cc 的 DNS 已存在（已由 Pages 自定义域自动建好）。
+routes = [
+  { pattern = "app.englearning.cc/api/*", zone_name = "englearning.cc" }
+]

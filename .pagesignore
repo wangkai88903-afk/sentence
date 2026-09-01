@@ -1,0 +1,21 @@
+# 部署到 Cloudflare Pages 时忽略的服务端/构建/开发文件
+node_modules
+.workbuddy
+server.js
+*.py
+package.json
+package-lock.json
+render.yaml
+*.log
+debug_collab.js
+test_*.js
+push_*.js
+push_three.js
+ocr_test.py
+extract.py
+find_*.py
+append_*.py
+build_*.py
+fix_*.py
+full_ocr.py
+ocr_*.py
