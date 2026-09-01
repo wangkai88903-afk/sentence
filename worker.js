@@ -96,6 +96,31 @@ async function familyIdByEmail(bucket, email){
   return map[e] || null;
 }
 
+// 通过 JWT 找家庭：先按邮箱扫 R2，再按 user_id 查 Supabase 映射表（迁移/兜底）
+async function familyIdByJWT(bucket, env, payload){
+  if(!payload) return null;
+  if(payload.email){
+    const fid = await familyIdByEmail(bucket, payload.email);
+    if(fid) return fid;
+  }
+  if(payload.sub){
+    try{
+      const url = (env.SUPABASE_URL||'').replace(/\/$/,'') + '/rest/v1/lcs_family_members?select=family_id&user_id=eq.' + encodeURIComponent(payload.sub);
+      const r = await fetch(url, {
+        headers: {
+          'apikey': env.SUPABASE_SERVICE_KEY||'',
+          'Authorization': 'Bearer ' + (env.SUPABASE_SERVICE_KEY||'')
+        }
+      });
+      if(r.ok){
+        const rows = await r.json();
+        if(Array.isArray(rows) && rows.length > 0 && rows[0].family_id) return rows[0].family_id;
+      }
+    }catch(_){}
+  }
+  return null;
+}
+
 // 鉴权：Supabase JWT（新）优先；若邮箱尚未绑定到家庭，可用 familyKey（旧，兼容/回滚）兜底
 async function authorize(request, env, bucket, body){
   const h = request.headers.get('Authorization') || '';
@@ -119,7 +144,7 @@ async function authorize(request, env, bucket, body){
 
   if(jwtAuth){
     if(!body || !body.familyId) return Object.assign({ok:true}, jwtAuth);
-    const fid = await familyIdByEmail(bucket, jwtAuth.email);
+    const fid = await familyIdByJWT(bucket, env, { email:jwtAuth.email, sub:jwtAuth.userId });
     if(fid === body.familyId) return Object.assign({ok:true}, jwtAuth);
     // 邮箱未绑定到任何家庭，但本地保存的 familyKey 正确：仍允许访问，方便迁移期用户
     if(keyAuth) return Object.assign({ok:true}, jwtAuth, {via:'jwt-key'});
