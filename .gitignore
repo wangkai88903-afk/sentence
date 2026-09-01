@@ -20,5 +20,6 @@ __pycache__/
 *.pyc
 node_modules/
 .workbuddy/
+.wrangler/
 ocr_8下/
 ocr_8上/

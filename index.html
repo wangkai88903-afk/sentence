@@ -25,6 +25,11 @@
   .hidden{display:none !important}
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 2px 10px rgba(20,30,60,.04)}
   .warnbox{background:#fff7e6;border:1px solid #ffd591;color:#7a4a00}
+  .update-notice{display:flex;align-items:flex-start;gap:10px;background:#eaf4ff;border:1px solid #b6d8ff;color:#0b4a8b;padding:12px 14px;border-radius:10px;margin-bottom:14px;position:relative}
+  .update-notice .un-ico{font-size:18px;line-height:1.4}
+  .update-notice .un-body{font-size:13px;line-height:1.6;flex:1}
+  .update-notice .un-body a{color:#0b62c9;font-weight:600}
+  .update-notice .un-close{position:absolute;top:6px;right:8px;border:none;background:transparent;font-size:18px;cursor:pointer;color:#0b4a8b;line-height:1}
   .imgview{position:fixed;inset:0;background:rgba(0,0,0,.86);display:flex;align-items:center;justify-content:center;z-index:60;cursor:zoom-out;padding:16px}
   .imgview img{max-width:96%;max-height:94%;border-radius:10px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
   .photo{cursor:zoom-in;border-radius:10px;margin-top:8px}
@@ -166,6 +171,12 @@
       <button class="btn sm ghost" id="logoutBtn" style="color:#fff;border-color:#fff;background:transparent">退出</button>
     </div>
     <div class="wrap">
+      <!-- 更新/迁移提示：按域名切换文案，首次进入显示，关闭后不再打扰 -->
+      <div id="updateNotice" class="update-notice hidden">
+        <span class="un-ico">📢</span>
+        <div class="un-body" id="unBody"></div>
+        <button id="unClose" class="un-close" aria-label="关闭提示">×</button>
+      </div>
       <!-- 孩子视图 -->
       <div id="childView" class="hidden">
         <div class="card">
@@ -4397,8 +4408,32 @@ window.SENTENCES = [
     function show(name){
       ["register","login","app"].forEach(function(n){ $(n).classList.toggle("hidden", n!==name); });
       $("mask").classList.add("hidden");
-      if(name==="app"){ startSync(); }
+      if(name==="app"){ startSync(); maybeShowUpdateNotice(); }
       else { if(syncTimer) clearInterval(syncTimer); setSyncStat("off"); }
+    }
+    function maybeShowUpdateNotice(){
+      var n = $("updateNotice");
+      if(!n) return;
+      // 已关闭过则不再显示（localStorage 按 origin 隔离，迁移后新域名首次会再提示一次，符合预期）
+      if(LS.get("lcs_updateNotice", "0") === "1"){ n.classList.add("hidden"); return; }
+      var body = $("unBody");
+      var isOld = /onrender\.com$/i.test(location.hostname);
+      if(isOld){
+        // 旧版（Render）：引导用户导出并迁移到新地址
+        body.innerHTML = '<b>这是旧版，即将停用 ⚠️</b><br>'+
+          '打卡已升级为云端永久保存。为避免记录丢失，请现在到「设置 → 导出备份」保存数据，'+
+          '再打开新版 <a href="https://app.englearning.cc" target="_blank" rel="noopener">app.englearning.cc</a> 的「设置 → 导入恢复」即可迁移，记录<strong>不会丢</strong>。<br>'+
+          '<span style="color:#c0392b;font-weight:600">旧版将很快关闭，请尽快迁移。</span>';
+      } else {
+        // 新版（Cloudflare Pages）：告知旧数据如何导入恢复
+        body.innerHTML = '<b>应用已升级到云端同步版</b><br>'+
+          '打卡数据现在永久保存在云端，不再因清理浏览器而丢失。<br>'+
+          '若你之前在旧版（<a href="https://lcs-checkin-sync.onrender.com" target="_blank" rel="noopener">lcs-checkin-sync.onrender.com</a>）已有打卡记录：请先回旧版「设置 → 导出备份」，再回到本版「设置 → 导入恢复」，记录<strong>不会丢</strong>。';
+      }
+      n.classList.remove("hidden");
+    }
+    if($("unClose")){
+      $("unClose").onclick = function(){ var n=$("updateNotice"); if(n) n.classList.add("hidden"); LS.set("lcs_updateNotice","1"); };
     }
 
     // ---------- 注册账号 ----------
