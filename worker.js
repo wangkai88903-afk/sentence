@@ -20,6 +20,125 @@ async function keyHash(k) {
   return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// ---------- Supabase 认证（口味 A：账号在 Supabase，数据仍在 R2）----------
+// JWT 验签走 JWKS（ES256，非对称），无需 JWT secret；service_role 仅用于写入映射表。
+function b64urlDecode(s){
+  s = String(s).replace(/-/g,'+').replace(/_/g,'/');
+  while(s.length % 4) s += '=';
+  const bin = atob(s);
+  const out = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) out[i]=bin.charCodeAt(i);
+  return out;
+}
+let JWKS_CACHE = null; // {keys, exp}
+async function getJWKS(env){
+  if(JWKS_CACHE && JWKS_CACHE.exp > Date.now()) return JWKS_CACHE.keys;
+  const url = (env.SUPABASE_URL||'').replace(/\/$/,'') + '/auth/v1/.well-known/jwks.json';
+  const r = await fetch(url, { headers: { 'apikey': env.SUPABASE_SERVICE_KEY || '' } });
+  if(!r.ok) return null;
+  const data = await r.json();
+  JWKS_CACHE = { keys: data.keys || [], exp: Date.now() + 3600*1000 };
+  return JWKS_CACHE.keys;
+}
+async function verifySupabaseJWT(token, env){
+  try{
+    const parts = String(token).split('.');
+    if(parts.length !== 3) return null;
+    const header = JSON.parse(new TextDecoder().decode(b64urlDecode(parts[0])));
+    if(header.alg !== 'ES256') return null;
+    const keys = await getJWKS(env);
+    if(!keys) return null;
+    const jwk = keys.find(k => k.kid === header.kid);
+    if(!jwk) return null;
+    const key = await crypto.subtle.importKey('jwk',
+      { kty: jwk.kty, crv: jwk.crv, x: jwk.x, y: jwk.y },
+      { name:'ECDSA', namedCurve:'P-256' }, false, ['verify']);
+    const sig = b64urlDecode(parts[2]);
+    const data = new TextEncoder().encode(parts[0] + '.' + parts[1]);
+    const ok = await crypto.subtle.verify({ name:'ECDSA', hash:'SHA-256' }, key, sig, data);
+    if(!ok) return null;
+    const payload = JSON.parse(new TextDecoder().decode(b64urlDecode(parts[1])));
+    const ref = env.SUPABASE_REF || '';
+    const okRef = (payload.ref && payload.ref===ref) || (payload.iss && payload.iss.indexOf(ref)>=0);
+    if(ref && !okRef) return null;
+    if(payload.exp && payload.exp*1000 < Date.now()) return null;
+    if(!payload.sub) return null;
+    return payload;
+  }catch(e){ return null; }
+}
+
+// 邮箱 -> familyId 映射（扫描 R2，60s 缓存，避免每次请求全量解析大 JSON）
+let EMAIL_FAM_CACHE = null; // {map, exp}
+async function familyIdByEmail(bucket, email){
+  if(!email) return null;
+  const e = String(email).trim().toLowerCase();
+  if(!EMAIL_FAM_CACHE || EMAIL_FAM_CACHE.exp < Date.now()){
+    const map = {};
+    try{
+      const listed = await bucket.list({ prefix:'families/' });
+      for(const obj of (listed.objects||[])){
+        const got = await bucket.get(obj.key); if(!got) continue;
+        let fam; try{ fam = JSON.parse(await got.text()); }catch(_){ continue; }
+        const fid = obj.key.replace(/^families\//,'').replace(/\.json$/,'');
+        const acc = fam.accounts || {};
+        for(const k of Object.keys(acc)){
+          const a = acc[k] || {};
+          if(a.email) map[String(a.email).trim().toLowerCase()] = fid;
+        }
+      }
+    }catch(_){}
+    EMAIL_FAM_CACHE = { map, exp: Date.now() + 60000 };
+  }
+  return EMAIL_FAM_CACHE.map[e] || null;
+}
+
+// 鉴权：Supabase JWT（新）优先，familyKey（旧，兼容/回滚）兜底
+async function authorize(request, env, bucket, body){
+  const h = request.headers.get('Authorization') || '';
+  if(h.startsWith('Bearer ')){
+    const payload = await verifySupabaseJWT(h.slice(7), env);
+    if(!payload) return { ok:false, code:401, msg:'登录已过期或无效，请重新登录' };
+    if(body && body.familyId){
+      const fid = await familyIdByEmail(bucket, payload.email);
+      if(fid !== body.familyId) return { ok:false, code:403, msg:'无权访问该家庭数据' };
+    }
+    return { ok:true, userId: payload.sub, email: payload.email, via:'jwt' };
+  }
+  if(body && body.familyKey) return { ok:true, via:'key' };
+  return { ok:false, code:401, msg:'缺少凭证' };
+}
+
+// claim：用 JWT 里的邮箱反查 R2 找到旧家庭，写映射表后返回 familyId
+async function handleClaim(bucket, request, env){
+  const h = request.headers.get('Authorization') || '';
+  if(!h.startsWith('Bearer ')) return { code:401, body:{ ok:false, msg:'缺少登录凭证' } };
+  const payload = await verifySupabaseJWT(h.slice(7), env);
+  if(!payload) return { code:401, body:{ ok:false, msg:'登录已过期或无效' } };
+  if(!payload.email) return { code:400, body:{ ok:false, msg:'账号缺少邮箱' } };
+  const fid = await familyIdByEmail(bucket, payload.email);
+  if(!fid) return { code:404, body:{ ok:false, msg:'该邮箱尚未在旧数据中登记，请先在设置里填写邮箱并同步' } };
+  // 尽力写入映射表（表未建时忽略错误）
+  try{
+    let role = 'child';
+    try{
+      const got = await bucket.get('families/'+fid+'.json');
+      const fam = got ? JSON.parse(await got.text()) : null;
+      const acc = (fam&&fam.accounts)||{};
+      for(const k of Object.keys(acc)){
+        const a = acc[k]||{};
+        if(a.email && String(a.email).trim().toLowerCase()===String(payload.email).trim().toLowerCase()){ role = a.role||'child'; break; }
+      }
+    }catch(_){}
+    const url = (env.SUPABASE_URL||'').replace(/\/$/,'') + '/rest/v1/lcs_family_members';
+    await fetch(url, {
+      method:'POST',
+      headers:{ 'apikey': env.SUPABASE_SERVICE_KEY||'', 'Authorization':'Bearer '+ (env.SUPABASE_SERVICE_KEY||''), 'Content-Type':'application/json', 'Prefer':'resolution=merge-duplicates' },
+      body: JSON.stringify({ user_id: payload.sub, family_id: fid, role })
+    });
+  }catch(_){}
+  return { code:200, body:{ ok:true, familyId: fid, role: 'child' } };
+}
+
 // ---------- 合并算法（与 server.js 一致） ----------
 function betterRec(a, b) {
   if (!a) return b || null;
@@ -135,35 +254,39 @@ async function handleCreate(bucket) {
   await bucket.put(famKey(fid), JSON.stringify(fam));
   return { code: 200, body: { ok: true, familyId: fid, familyKey: fk, code: fid + '-' + fk } };
 }
-async function handlePull(bucket, body) {
+async function handlePull(bucket, body, request, env) {
+  const auth = await authorize(request, env, bucket, body);
+  if (!auth.ok) return { code: auth.code, body: { ok:false, msg: auth.msg } };
   let loaded = await loadFamily(bucket, body.familyId);
   let fam = loaded ? loaded.fam : null;
   if (!fam) {
-    if (body.familyKey) {
+    if (auth.via === 'key') {
       // 自愈：云端无数据（理论上 R2 持久化后不会丢），用口令重建空家庭并返回
       fam = { keyHash: await keyHash(body.familyKey), accounts: null, checkins: {}, extra: [], removed: [], updatedAt: Date.now() };
     } else {
       return { code: 401, body: { ok: false, msg: '家庭不存在，请确认口令或重新创建家庭云' } };
     }
   }
-  if (fam.keyHash !== await keyHash(body.familyKey)) {
+  if (auth.via === 'key' && fam.keyHash !== await keyHash(body.familyKey)) {
     return { code: 401, body: { ok: false, msg: '家庭口令不正确' } };
   }
   return { code: 200, body: pullResponse(fam) };
 }
-async function handlePush(bucket, body) {
+async function handlePush(bucket, body, request, env) {
   // 并发写：读→改→写，etag 冲突则重试（家庭场景并发极低，5 次足够）
+  const auth = await authorize(request, env, bucket, body);
+  if (!auth.ok) return { code: auth.code, body: { ok:false, msg: auth.msg } };
   for (let attempt = 0; attempt < 5; attempt++) {
     let loaded = await loadFamily(bucket, body.familyId);
     let fam = loaded ? loaded.fam : null;
     if (!fam) {
-      if (body.familyKey) {
+      if (auth.via === 'key') {
         fam = { keyHash: await keyHash(body.familyKey), accounts: null, checkins: {}, extra: [], removed: [], updatedAt: Date.now() };
       } else {
         return { code: 401, body: { ok: false, msg: '家庭不存在，请确认口令或重新创建家庭云' } };
       }
     }
-    if (fam.keyHash !== await keyHash(body.familyKey)) {
+    if (auth.via === 'key' && fam.keyHash !== await keyHash(body.familyKey)) {
       return { code: 401, body: { ok: false, msg: '家庭口令不正确' } };
     }
     if (body.byUser && fam.removed && fam.removed.indexOf(body.byUser) >= 0) {
@@ -216,11 +339,15 @@ export default {
         return json(r.code, r.body, cors);
       }
       if (p === '/api/sync/pull') {
-        const r = await handlePull(bucket, body);
+        const r = await handlePull(bucket, body, request, env);
         return json(r.code, r.body, cors);
       }
       if (p === '/api/sync/push') {
-        const r = await handlePush(bucket, body);
+        const r = await handlePush(bucket, body, request, env);
+        return json(r.code, r.body, cors);
+      }
+      if (p === '/api/auth/claim') {
+        const r = await handleClaim(bucket, request, env);
         return json(r.code, r.body, cors);
       }
       return json(404, { ok: false, msg: '未知接口' }, cors);

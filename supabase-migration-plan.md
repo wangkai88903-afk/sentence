@@ -1,7 +1,8 @@
 # 长难句打卡 · 迁移 Supabase 认证方案（口味 A）
 
 > 决策日期：2026-09-01，用户选定**口味 A**。
-> 目标：实现「任何设备、只用用户名+密码即可登录」，同时**照片与家庭数据完全不动**。
+> 2026-09-01 21:3x 重大修订：**登录账号改为真实邮箱**（用户在 App「账号设置」里自行填写并同步到 R2），废弃原合成邮箱方案；相应 SQL 已删 `lcs_profiles` 表。
+> 目标：实现「任何设备、只用邮箱+密码即可登录」，同时**照片与家庭数据完全不动**。
 
 ---
 
@@ -47,39 +48,20 @@
 
 ---
 
-## 三、用户名怎么变成 Supabase 账号（最容易踩的坑）
+## 三、登录邮箱怎么来的（真实邮箱，2026-09-01 已改为真实邮箱路线）
 
-Supabase Auth 以邮箱为主键。要做到"用户输入中文用户名即可登录"，采用**合成邮箱**：
+上一版方案用「合成邮箱 `u<sha256>@lcs.invalid`」，现已废弃。改为**真实邮箱**：
 
-```js
-// 用户名 → 稳定的合成邮箱（前端与迁移脚本必须用完全相同的算法）
-async function userToEmail(username) {
-  const norm = username.trim().toLowerCase();          // 归一化
-  const buf  = new TextEncoder().encode('lcs-user|' + norm);
-  const hash = await crypto.subtle.digest('SHA-256', buf);
-  const hex  = [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, '0')).join('');
-  return 'u' + hex.slice(0, 32) + '@lcs.invalid';      // 33 字符 localpart，合法
-}
-```
+- 用户在 App 的「⚙ 设置 → 账号设置」里自行填写**真实邮箱**（上一步已上线，带格式校验 + 二次确认 + 保存即同步到 R2 `accounts[k].email`）。
+- 迁移后该邮箱即登录账号；且因为邮箱真实可用，**开启 Supabase 邮箱确认**，用户可自助「忘记密码」收信重置——原合成邮箱"无法自助找回"的痛点消失。
 
-为什么这么做：
+为什么不用合成邮箱了：
 
-1. **中文用户名不能直接做邮箱 localpart**。`小头爸爸@...` 会被 Supabase 直接拒。哈希成 hex 后一律合法。
-2. **全局唯一性天然保证**：`auth.users.email` 本身有唯一约束，同名用户第二次注册必然失败 → 正是我们要的"用户名全局唯一"。
-3. **不可反推**：从邮箱看不出中文用户名，顺带缓解一点信息泄露。
-4. 中文名显示靠 `lcs_profiles.username` 存原文，界面上照旧显示"小头爸爸"。
-5. 域名用 `.invalid`（RFC 2606 保留），永远不会真的往外发信。
+1. 真实邮箱是用户能记住、能收信的；合成邮箱 `.invalid` 域名永远发不出信，必须依赖管理员后台改密码。
+2. 用户诉求就是"填一个邮箱、之后用邮箱直接登录"——真实邮箱天然契合，且每个孩子需独立邮箱（无邮箱用家长邮箱 `+别名`，如 `wangkai88903+child@gmail.com`，Supabase 视为不同邮箱、确认信进同一收件箱）。
+3. 全局唯一性由 `auth.users.email` 唯一约束保证 → 即"账号全局唯一"。
 
-### 必须配套的两个 Supabase 设置
-
-- **关闭邮箱确认**（Authentication → Providers → Email → Confirm email 关掉）。
-  合成邮箱收不到确认信，不关就永远登不进去。
-- **接受"无法邮件自助找回密码"**。这是合成邮箱的唯一代价。补偿手段：
-  - 你（管理员）在 Supabase 控制台直接给成员改密码；或
-  - 后续加一个 parent 用 service_role 重置 child 密码的入口（Phase 6，可选）。
-
-> 若你更看重"自助找回密码"，另一条路是要求真实邮箱注册。但孩子多半没有邮箱，
-> 且改动会波及注册 UI，所以默认走合成邮箱。
+注意：**中文显示名仍存 R2**（`accounts[k].user`，如「小头爸爸」），只在界面显示；登录身份是邮箱。两者在同一账号对象里共存，不冲突。因此 Supabase 侧**不再需要 `lcs_profiles` 表**（该表已在 SQL 中删除）。
 
 ---
 
@@ -188,13 +170,16 @@ wrangler secret put SUPABASE_JWT_SECRET     # 仅 HS256 项目需要；ES256 项
 ## 五、前端改造（`index.html`）
 
 1. 引入 `supabase.min.js`（词根目录下已有现成文件，直接复制过来，避免依赖 CDN）。
-2. **登录页**改为默认「云端登录」：用户名 + 密码 → `userToEmail()` → `signInWithPassword`。
+2. **登录页**改为默认「云端登录」：邮箱 + 密码 → `signInWithPassword`。
    成功后：
-   - 读 `lcs_profiles` / `lcs_family_members` 拿到 `familyId`；
+   - 读 `lcs_family_members` 拿到 `familyId`（按当前登录用户的 `sub`）；
    - 写入本机 `cloud = { familyId }`（不再需要 `familyKey`）；
    - 调 `syncPull()` 拉全量数据（含照片）落本机 → 秒变"已登录且有数据"。
-3. **注册**：`signUp` → 写 `lcs_profiles`（用户名重复时 Supabase 报唯一冲突，提示"该用户名已被使用"）
-   → 首个用户调 Worker `/api/family/create` 拿 familyId → 调 RPC `lcs_claim_family`。
+3. **注册（首登/新用户）**：`signUp({ email, password })` → Supabase 发确认信 →
+   用户点开确认后，**调 Worker `/api/auth/claim`（带 JWT）**：
+   Worker 按 JWT 里的 `email` 扫描 R2 各家庭，找到 `accounts[k].email` 匹配的那个 →
+   取它的 `familyId` + `role` → 写 `lcs_family_members(sub, familyId, role)` → 返回 `familyId` →
+   前端 `syncPull`。即"首次用邮箱注册即自动绑定旧家庭"，无需管理员建号、无需重置邮件。
 4. **加入家庭**：输入邀请码 → RPC `lcs_redeem_invite` → 拿到 familyId → 同步。
 5. **所有 `/api/*` 请求**统一带 `Authorization: Bearer <session.access_token>`；
    token 过期由 supabase-js 自动 refresh，失败则弹回登录页。
@@ -203,17 +188,27 @@ wrangler secret put SUPABASE_JWT_SECRET     # 仅 HS256 项目需要；ES256 项
 
 ---
 
-## 六、存量迁移（就 2~4 个人，一次性）
+## 六、存量迁移（改为「用户自助 claim」，无需批量建号）
 
-1. 从 R2 导出现有 `families/{familyId}.json`，取出 `accounts` 里的用户名与 `role`。
-2. 对每个用户：`admin.createUser({ email: userToEmail(name), password: <临时密码>, email_confirm: true })`。
-3. 写 `lcs_profiles`（中文用户名原文）+ `lcs_family_members`（映射到原 familyId、原 role）。
-4. **把临时密码告诉家人，首次登录后改掉。**
+由于邮箱已在 App 里由各用户填好并同步到 R2，迁移不再需要管理员用 Admin API 批量建号 + 发重置邮件。流程变为：
 
-> ⚠️ **密码哈希无法搬运。** Supabase Auth 不接受外部注入的哈希，现有 `hash(p)` 没法平移。
-> 这是本方案唯一的真麻烦，但只涉及 2~4 人，一次性成本极低。
+1. **先部署**新版前端（邮箱登录/注册）+ Worker 的 `/api/auth/claim`（保留 familyKey 旧路径可回滚）。
+2. **通知家人**：各自用「填好的邮箱 + 自设密码」在新版 App 注册/登录。
+   - 注册成功 → 收确认信 → 点开确认 → 自动 `claim` 旧家庭 → 数据秒回。
+   - 若个别家人不会操作，回退到管理员 `admin.createUser({ email, password: 临时, email_confirm: true })` + 写 `lcs_family_members`，再把临时密码给他。
+3. 前端上线前，我会先从 R2 导出一份「用户名 ↔ 邮箱」清单给你**人工核对**，确认无误再切。
+
+> ⚠️ **密码哈希仍无法导入 Supabase**，但变为"用户自己设新密码"（注册时填），不是管理员派发，体验顺得多。
+> 唯一前置：**每人必须已填真实邮箱且互不相同**（孩子用 `+别名`）。
 
 **R2 数据零迁移**——`families/*.json` 原地不动，照片一张都不用重传。
+
+### 6.1 Worker `/api/auth/claim` 的实现要点
+- 入参：请求头 `Authorization: Bearer <JWT>`，body `{ familyId? }`（可不传，由邮件反查）。
+- 步骤：验签 JWT → 取 `payload.email` 与 `payload.sub` → 遍历 R2 `families/*.json` → 在 `accounts` 中找 `email === payload.email` 的账号 → 拿到 `familyId` + `role` → 用 service_role 写 `lcs_family_members(sub, familyId, role)` → 返回 `familyId`。
+- 家庭数少（几十个量级），全量扫描可接受；若后续规模变大，再加一张 `lcs_email_index(email → familyId)` 表做 O(1) 反查。
+- 找不到匹配邮箱 → 返回 404（提示"该邮箱尚未在旧数据中登记，请先在原设备填写"）。
+- 该端点与 familyKey 路径互斥：claim 走 JWT，不校验 familyKey。
 
 ---
 
@@ -221,7 +216,7 @@ wrangler secret put SUPABASE_JWT_SECRET     # 仅 HS256 项目需要；ES256 项
 
 | 阶段 | 动作 | 验证 | 回滚方式 |
 |---|---|---|---|
-| P0 | 跑 `supabase_schema_lcs.sql`；关闭邮箱确认；确认 JWT 算法 | SQL 自检返回 3 表 / 4 函数 | drop 掉 `lcs_*` 对象即可，不影响词根 |
+| P0 | 跑 `supabase_schema_lcs.sql`；**开启**邮箱确认；确认 JWT 算法 | SQL 自检返回 2 表 / 4 函数 | drop 掉 `lcs_*` 对象即可，不影响词根 |
 | P1 | Worker 加 JWT 验签 + `authorize()`，**保留 familyKey 路径** | curl 带假 token 得 401；带旧 familyKey 仍 200 | 回退上一版 Worker |
 | P2 | 手工建 1 个测试账号，跑通「新设备纯用户名密码登录 → 拉到数据」 | 无痕窗口登录成功且能看到打卡 | 删测试账号 |
 | P3 | 前端上线云端登录（本机登录降级保留） | 双设备互登、打卡双向同步 | Pages 回滚到上一次部署 |
@@ -234,8 +229,9 @@ wrangler secret put SUPABASE_JWT_SECRET     # 仅 HS256 项目需要；ES256 项
 
 | 风险 | 影响 | 对策 |
 |---|---|---|
-| 密码哈希不可迁移 | 家人需各自重设一次密码 | 人少，一次性；提前告知 |
-| 合成邮箱 → 无法邮件找回密码 | 忘密码需管理员介入 | Supabase 控制台重置；或后续加 parent 重置入口 |
+| 密码哈希不可迁移 | 家人需各自用邮箱+自设密码注册（非管理员派发） | 人少，一次性；提前告知 |
+| 真实邮箱未填/填错 → 无法登录或收不到信 | 迁移后登不进 | 迁移前导出 username↔email 清单人工核对；填错用「忘记密码」走 Supabase 重置（真实邮箱可用） |
+| 家庭成员邮箱重复 | Supabase 报唯一冲突、注册失败 | 孩子无邮箱用家长 `+别名`，每人独立邮箱 |
 | Supabase 免费层一周无活动休眠 | 休眠期间**无法登录**（数据不丢） | 长难句天天用不会触发；且顺带帮词根保活。真出问题再议升 Pro |
 | service_role key 泄露 = 全库可写 | 严重 | 只存 Worker Secret，**绝不进前端、绝不进 git** |
 | JWT 算法判断错（HS256 / ES256） | 验签全挂 | P1 阶段先用真 token 单测验签，再接主流程 |
@@ -246,13 +242,13 @@ wrangler secret put SUPABASE_JWT_SECRET     # 仅 HS256 项目需要；ES256 项
 
 ## 九、需要你提供 / 操作的清单
 
-- [ ] Supabase 控制台跑 `supabase_schema_lcs.sql`（我已写好，直接粘贴）
-- [ ] Authentication → Providers → Email → **关闭 Confirm email**
+- [ ] Supabase 控制台跑 `supabase_schema_lcs.sql`（已改为真实邮箱版，无 `lcs_profiles` 表）
+- [ ] Authentication → Providers → Email → **开启 Confirm email**（真实邮箱，可自助找回密码）
 - [ ] 告诉我 Settings → API → JWT 用的是 **legacy HS256** 还是 **非对称 ES256**
 - [ ] 若为 HS256：提供 JWT Secret（我存进 Worker Secret，不写入任何文件）
 - [ ] 提供 **service_role key**（同上，只进 Worker Secret）
-- [ ] 现有家庭成员名单 + 各自角色（parent/child），用于迁移建号
-- [ ] 确认可以接受"家人各重设一次密码"
+- [ ] 确认每位成员已填真实邮箱且**互相独立**（孩子用 `+别名`）；我迁移前会导出 username↔email 清单给你核对
+- [ ] 确认可以接受"家人各自用邮箱+自设密码注册/登录"（密码不再由管理员派发）
 
 > 安全提醒：这两个 key 请通过一次性方式给我，用完我会提示你在控制台**轮换**。
 > 上次那个 Cloudflare API Token（`cfut_...`）也**仍待撤销**。
@@ -266,3 +262,15 @@ wrangler secret put SUPABASE_JWT_SECRET     # 仅 HS256 项目需要；ES256 项
 副作用是两个应用共享同一套账号体系 → 未来真要合并成一个 PWA 时，登录状态天然打通，比原计划更顺。
 
 当前仍然冻结的事项（不受本方案影响）：词根暂不升 Pro、词根完整版暂不上线、合并外壳站点暂不启动。
+
+---
+
+## 十一、变更记录
+
+- **2026-09-01 21:3x｜真实邮箱路线替代合成邮箱**
+  - 起因：用户要求在 App 设置面板自行填邮箱，迁移后用该邮箱直接登录（对话 `开始吧` 之前）。
+  - 已落地：第 1 步「账号设置」UI 已上线（git `175dc36` + Worker 部署），邮箱随 R2 同步，且修复了 5 处邮箱被静默丢弃/反向擦除的路径，e2e 验证通过。
+  - 本方案同步修订：删除合成邮箱 `userToEmail()` 逻辑、改为真实邮箱；Supabase 侧由"关闭邮箱确认"改为"开启邮箱确认"（可自助找回密码）；`supabase_schema_lcs.sql` 删除已废弃的 `lcs_profiles` 表（中文显示名仍存 R2）；存量迁移由"管理员批量建号+重置邮件"改为"用户自助 claim（邮箱注册即绑定旧家庭）"，新增 `/api/auth/claim` 设计。
+  - 不受影响：R2 数据零迁移、照片全留 R2、Worker 的 `mergeInto`/ETag/家庭 JSON 不动、JWT 验签与 `familyKey` 兼容路径设计不变。
+  - 仍待用户提供：JWT 算法（HS256/ES256）、service_role key、（ES256 则无需 JWT secret）。
+  - 仍待用户操作：各成员填完真实邮箱并通知我 → 我导出 username↔email 清单核对 → 再跑迁移。

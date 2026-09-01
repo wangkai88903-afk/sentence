@@ -14,19 +14,11 @@
 
 
 -- ---------------------------------------------------------------------
--- 1) 用户资料表：Supabase user  ->  显示用的中文用户名
---    登录邮箱是合成值（见 migration plan），真正给人看的名字存这里。
+-- 1) （已废弃）lcs_profiles 表
+--    原设计用合成邮箱、需单独存中文用户名。2026-09-01 改为真实邮箱后，
+--    登录邮箱即 auth.users.email，中文显示名仍存在 R2 的 accounts[k].user，
+--    不再需要本表。下方自 lcs_family_members 起为当前有效结构。
 -- ---------------------------------------------------------------------
-create table if not exists public.lcs_profiles (
-  user_id    uuid primary key references auth.users(id) on delete cascade,
-  username   text not null,
-  created_at timestamptz not null default now()
-);
-
--- 全局用户名唯一（大小写不敏感）——这就是"用户名全局唯一"的落点
-create unique index if not exists lcs_profiles_username_uidx
-  on public.lcs_profiles (lower(username));
-
 
 -- ---------------------------------------------------------------------
 -- 2) 家庭成员映射表：user -> R2 里的 familyId
@@ -213,27 +205,8 @@ grant execute on function public.lcs_redeem_invite(text) to authenticated;
 -- ---------------------------------------------------------------------
 -- 8) RLS 策略
 -- ---------------------------------------------------------------------
-alter table public.lcs_profiles        enable row level security;
 alter table public.lcs_family_members  enable row level security;
 alter table public.lcs_family_invites  enable row level security;
-
--- lcs_profiles：本人可读写自己；同家庭成员可读（用于显示成员列表）
-drop policy if exists lcs_profiles_self_rw on public.lcs_profiles;
-create policy lcs_profiles_self_rw on public.lcs_profiles
-  for all to authenticated
-  using (user_id = auth.uid())
-  with check (user_id = auth.uid());
-
-drop policy if exists lcs_profiles_family_read on public.lcs_profiles;
-create policy lcs_profiles_family_read on public.lcs_profiles
-  for select to authenticated
-  using (
-    exists (
-      select 1 from public.lcs_family_members m
-       where m.user_id = lcs_profiles.user_id
-         and m.family_id in (select public.lcs_my_families())
-    )
-  );
 
 -- lcs_family_members：可读自己所属家庭的全部成员行；写入只走上面的 RPC
 drop policy if exists lcs_family_members_read on public.lcs_family_members;
