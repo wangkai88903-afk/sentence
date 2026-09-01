@@ -1,4 +1,5 @@
 # 部署到 Cloudflare Pages 时忽略的服务端/构建/开发文件
+.git
 node_modules
 .workbuddy
 server.js
